@@ -103,7 +103,7 @@ for_statement : FOR LEFT_RBRACKET init_expression SEMICOLON cond_expression SEMI
 
 init_expression : for_init_list;
 
-all_assignment : ( int_assignment | float_assignment | string_assignment | dynamic_assignment );
+all_assignment : ( int_assignment | float_assignment | string_assignment | dynamic_assignment | assignment);
 
 for_init_list : for_init_list COMMA all_assignment
               | all_assignment
@@ -217,7 +217,7 @@ table_result : TABLE_NEW function_definition_params
               | function_call_assignment
               ;
 
-column_result : COLUMN_NEW LEFT_RBRACKET literal_t COMMA TYPE RIGHT_RBRACKET
+column_result : COLUMN_NEW LEFT_RBRACKET literal_t COMMA (INT_TYPE | STRING_TYPE | FLOAT_TYPE) RIGHT_RBRACKET
               | function_call_assignment
               ;
 
