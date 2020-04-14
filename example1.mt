@@ -8,3 +8,16 @@ value[1] = "String"
 value[2] = "hahaha"
 Row row1 = Row.new(get_columns(table1), value)
 add_row(table1, row1)
+
+def func1 (a,b,c)
+  Integer a = 1
+  a += 1
+  return a
+end
+
+func_1()
+func_2(1)
+
+for(i = 0; i < length; i+=1)
+  puts(mas[i])
+end
