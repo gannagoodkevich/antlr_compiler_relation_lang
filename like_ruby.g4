@@ -127,10 +127,6 @@ statement_expression_list : expression terminator
                           | statement_expression_list break_expression terminator
                           ;
 
-assignment : var_id=lvalue op=ASSIGN rvalue
-           | var_id=lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) rvalue
-           ;
-
 dynamic_assignment : var_id=lvalue op=ASSIGN dynamic_result
                    | var_id=lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) dynamic_result
                    ;
@@ -155,6 +151,10 @@ column_assignment : COLUMN_TYPE var_id=lvalue op=ASSIGN column_result
 
 row_assignment : ROW_TYPE var_id=lvalue op=ASSIGN row_result
                ;
+
+assignment : var_id=lvalue op=ASSIGN rvalue
+              | var_id=lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) rvalue
+              ;
 
 initial_array_assignment : var_id=lvalue op=ASSIGN LEFT_SBRACKET RIGHT_SBRACKET;
 
@@ -295,6 +295,7 @@ rvalue : lvalue
        | LEFT_RBRACKET rvalue RIGHT_RBRACKET
        ;
 
+
 break_expression : BREAK;
 
 literal_t : LITERAL;
@@ -324,6 +325,12 @@ terminator : terminator SEMICOLON
 else_token : ELSE;
 
 crlf : CRLF;
+
+INT_TYPE : 'Integer';
+FLOAT_TYPE: 'Float';
+STRING_TYPE: 'String';
+
+TYPE : INT_TYPE | FLOAT_TYPE | STRING_TYPE;
 
 fragment ESCAPED_QUOTE : '\\"';
 LITERAL : '"' ( ESCAPED_QUOTE | ~('\n'|'\r') )*? '"'
@@ -389,6 +396,7 @@ RIGHT_RBRACKET : ')';
 LEFT_SBRACKET : '[';
 RIGHT_SBRACKET : ']';
 
+
 NIL : 'nil';
 
 SL_COMMENT : ('#' ~('\r' | '\n')* '\r'? '\n') -> skip;
@@ -398,10 +406,6 @@ WS : (' '|'\t')+ -> skip;
 INT : [0-9]+;
 FLOAT : [0-9]*'.'[0-9]+;
 ID : [a-z][a-z0-9_]*;
-TYPE : INT_TYPE | FLOAT_TYPE | STRING_TYPE;
-INT_TYPE : 'Integer';
-FLOAT_TYPE: 'Float';
-STRING_TYPE: 'String';
 TABLE_TYPE : 'Table';
 ROW_TYPE: 'Row';
 COLUMN_TYPE: 'Column';
