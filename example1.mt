@@ -9,6 +9,11 @@ value[2] = "hahaha"
 Row row1 = Row.new(get_columns(table1), value)
 add_row(table1, row1)
 
+Integer a = (Integer) 10.99
+String b = (String) funct(s)
+Integer c = func(as, dd)
+c = (Float) func(a)
+
 def func1 (a,b,c)
   Integer a = 1
   a += 1

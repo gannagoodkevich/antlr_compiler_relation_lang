@@ -152,8 +152,8 @@ column_assignment : COLUMN_TYPE var_id=lvalue op=ASSIGN column_result
 row_assignment : ROW_TYPE var_id=lvalue op=ASSIGN row_result
                ;
 
-assignment : var_id=lvalue op=ASSIGN rvalue
-              | var_id=lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) rvalue
+assignment : var_id=lvalue op=ASSIGN (LEFT_RBRACKET ( INT_TYPE | FLOAT_TYPE | STRING_TYPE) RIGHT_RBRACKET)? rvalue
+              | var_id=lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) (LEFT_RBRACKET ( INT_TYPE | FLOAT_TYPE | STRING_TYPE) RIGHT_RBRACKET)? rvalue
               ;
 
 initial_array_assignment : var_id=lvalue op=ASSIGN LEFT_SBRACKET RIGHT_SBRACKET;
@@ -195,6 +195,9 @@ int_result : int_result op=( MUL | DIV | MOD ) int_result
            | int_result op=( PLUS | MINUS ) int_result
            | LEFT_RBRACKET int_result RIGHT_RBRACKET
            | int_t
+           | (LEFT_RBRACKET INT_TYPE RIGHT_RBRACKET) float_t
+           | (LEFT_RBRACKET INT_TYPE RIGHT_RBRACKET) literal_t
+           | (LEFT_RBRACKET INT_TYPE RIGHT_RBRACKET)? dynamic
            ;
 
 float_result : float_result op=( MUL | DIV | MOD ) float_result
@@ -205,12 +208,18 @@ float_result : float_result op=( MUL | DIV | MOD ) float_result
              | float_result op=( PLUS | MINUS )  int_result
              | LEFT_RBRACKET float_result RIGHT_RBRACKET
              | float_t
+             | (LEFT_RBRACKET FLOAT_TYPE RIGHT_RBRACKET) int_t
+             | (LEFT_RBRACKET FLOAT_TYPE RIGHT_RBRACKET) literal_t
+             | (LEFT_RBRACKET FLOAT_TYPE RIGHT_RBRACKET)? dynamic
              ;
 
 string_result : string_result op=MUL int_result
               | int_result op=MUL string_result
               | string_result op=PLUS string_result
               | literal_t
+              | (LEFT_RBRACKET STRING_TYPE RIGHT_RBRACKET) int_t
+              | (LEFT_RBRACKET STRING_TYPE RIGHT_RBRACKET) float_t
+              | (LEFT_RBRACKET STRING_TYPE RIGHT_RBRACKET)? dynamic
               ;
 
 table_result : TABLE_NEW function_definition_params
