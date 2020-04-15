@@ -1,6 +1,11 @@
 grammar like_ruby;
 
-prog : expression_list;
+prog : (function_definition_list)? expression_list;
+
+function_definition_list : function_definition_header
+                         | function_definition_list function_definition_header terminator
+                         | terminator
+                         ;
 
 expression_list : expression terminator
                 | expression_list expression terminator
