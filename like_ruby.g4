@@ -1,6 +1,6 @@
 grammar like_ruby;
 
-prog : (function_definition_list)? expression_list;
+prog : (function_definition_list)? expression_list ;
 
 function_definition_list : function_definition_header
                          | function_definition_list function_definition_header terminator
@@ -47,7 +47,7 @@ function_definition_header : DEF function_name crlf
                            ;
 
 function_name : id_function
-              | id
+              | my_id
               ;
 
 function_definition_params : LEFT_RBRACKET RIGHT_RBRACKET
@@ -59,7 +59,7 @@ function_definition_params_list : function_definition_param_id
                                 | function_definition_params_list COMMA function_definition_param_id
                                 ;
 
-function_definition_param_id : id;
+function_definition_param_id : my_id;
 
 return_statement : RETURN all_result;
 
@@ -77,7 +77,7 @@ function_param : ( function_unnamed_param | function_named_param );
 
 function_unnamed_param : ( int_result | float_result | string_result | dynamic_result );
 
-function_named_param : id op=ASSIGN ( int_result | float_result | string_result | dynamic_result );
+function_named_param : my_id op=ASSIGN ( int_result | float_result | string_result | dynamic_result );
 
 function_call_assignment : function_call;
 
@@ -171,7 +171,7 @@ array_definition_elements : ( int_result | dynamic_result )
                           | array_definition_elements COMMA ( int_result | dynamic_result )
                           ;
 
-array_selector : id LEFT_SBRACKET ( int_result | dynamic_result ) RIGHT_SBRACKET
+array_selector : my_id LEFT_SBRACKET ( int_result | dynamic_result ) RIGHT_SBRACKET
                | id_global LEFT_SBRACKET ( int_result | dynamic_result ) RIGHT_SBRACKET
                ;
 
@@ -191,7 +191,7 @@ dynamic_result : dynamic_result op=( MUL | DIV | MOD ) int_result
                | dynamic
                ;
 
-dynamic : id
+dynamic : my_id
         | function_call_assignment
         | array_selector
         ;
@@ -235,7 +235,7 @@ column_result : COLUMN_NEW LEFT_RBRACKET literal_t COMMA (INT_TYPE | STRING_TYPE
               | function_call_assignment
               ;
 
-row_result : ROW_NEW LEFT_RBRACKET function_call_assignment COMMA  id RIGHT_RBRACKET
+row_result : ROW_NEW LEFT_RBRACKET function_call_assignment COMMA  my_id RIGHT_RBRACKET
               | function_call_assignment
               ;
 
@@ -253,10 +253,10 @@ comparison : left=comp_var op=( LESS | GREATER | LESS_EQUAL | GREATER_EQUAL ) ri
 
 comp_var : all_result
          | array_selector
-         | id
+         | my_id
          ;
 
-lvalue : id
+lvalue : my_id
        //| id_global
        ;
 
@@ -324,7 +324,7 @@ bool_t : TRUE
 
 nil_t : NIL;
 
-id : ID;
+my_id : ID;
 
 id_global : ID_GLOBAL;
 
