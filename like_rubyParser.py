@@ -716,6 +716,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitProg" ):
                 listener.exitProg(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitProg" ):
+                return visitor.visitProg(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -771,6 +777,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitFunction_definition_list" ):
                 listener.exitFunction_definition_list(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunction_definition_list" ):
+                return visitor.visitFunction_definition_list(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -856,6 +868,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitExpression_list" ):
                 listener.exitExpression_list(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitExpression_list" ):
+                return visitor.visitExpression_list(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -972,6 +990,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitExpression" ):
                 listener.exitExpression(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitExpression" ):
+                return visitor.visitExpression(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1083,6 +1107,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitGlobal_get" ):
                 listener.exitGlobal_get(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGlobal_get" ):
+                return visitor.visitGlobal_get(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1137,6 +1167,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitGlobal_set" ):
                 listener.exitGlobal_set(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGlobal_set" ):
+                return visitor.visitGlobal_set(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1181,6 +1217,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitGlobal_result" ):
                 listener.exitGlobal_result(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGlobal_result" ):
+                return visitor.visitGlobal_result(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1220,6 +1262,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitFunction_inline_call" ):
                 listener.exitFunction_inline_call(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunction_inline_call" ):
+                return visitor.visitFunction_inline_call(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1263,6 +1311,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitRequire_block" ):
                 listener.exitRequire_block(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitRequire_block" ):
+                return visitor.visitRequire_block(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1316,6 +1370,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitPir_inline" ):
                 listener.exitPir_inline(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPir_inline" ):
+                return visitor.visitPir_inline(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1361,6 +1421,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitPir_expression_list" ):
                 listener.exitPir_expression_list(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPir_expression_list" ):
+                return visitor.visitPir_expression_list(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1409,6 +1475,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitFunction_definition" ):
                 listener.exitFunction_definition(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunction_definition" ):
+                return visitor.visitFunction_definition(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1452,6 +1524,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitFunction_definition_body" ):
                 listener.exitFunction_definition_body(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunction_definition_body" ):
+                return visitor.visitFunction_definition_body(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1503,6 +1581,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitFunction_definition_header" ):
                 listener.exitFunction_definition_header(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunction_definition_header" ):
+                return visitor.visitFunction_definition_header(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1571,6 +1655,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitFunction_name" ):
                 listener.exitFunction_name(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunction_name" ):
+                return visitor.visitFunction_name(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1629,6 +1719,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitFunction_definition_params" ):
                 listener.exitFunction_definition_params(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunction_definition_params" ):
+                return visitor.visitFunction_definition_params(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1702,6 +1798,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitFunction_definition_params_list" ):
                 listener.exitFunction_definition_params_list(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunction_definition_params_list" ):
+                return visitor.visitFunction_definition_params_list(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
     def function_definition_params_list(self, _p:int=0):
@@ -1767,6 +1869,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitFunction_definition_param_id" ):
                 listener.exitFunction_definition_param_id(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunction_definition_param_id" ):
+                return visitor.visitFunction_definition_param_id(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1809,6 +1917,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitReturn_statement" ):
                 listener.exitReturn_statement(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitReturn_statement" ):
+                return visitor.visitReturn_statement(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1863,6 +1977,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitFunction_call" ):
                 listener.exitFunction_call(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunction_call" ):
+                return visitor.visitFunction_call(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1927,6 +2047,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitFunction_call_param_list" ):
                 listener.exitFunction_call_param_list(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunction_call_param_list" ):
+                return visitor.visitFunction_call_param_list(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1973,6 +2099,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitFunction_call_params" ):
                 listener.exitFunction_call_params(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunction_call_params" ):
+                return visitor.visitFunction_call_params(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2043,6 +2175,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitFunction_param" ):
                 listener.exitFunction_param(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunction_param" ):
+                return visitor.visitFunction_param(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2106,6 +2244,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitFunction_unnamed_param" ):
                 listener.exitFunction_unnamed_param(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunction_unnamed_param" ):
+                return visitor.visitFunction_unnamed_param(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2189,6 +2333,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitFunction_named_param" ):
                 listener.exitFunction_named_param(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunction_named_param" ):
+                return visitor.visitFunction_named_param(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2255,6 +2405,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitFunction_call_assignment" ):
                 listener.exitFunction_call_assignment(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunction_call_assignment" ):
+                return visitor.visitFunction_call_assignment(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2310,6 +2466,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitAll_result" ):
                 listener.exitAll_result(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitAll_result" ):
+                return visitor.visitAll_result(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2378,6 +2540,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitElsif_statement" ):
                 listener.exitElsif_statement(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitElsif_statement" ):
+                return visitor.visitElsif_statement(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2442,6 +2610,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitIf_elsif_statement" ):
                 listener.exitIf_elsif_statement(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitIf_elsif_statement" ):
+                return visitor.visitIf_elsif_statement(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2555,6 +2729,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitIf_statement" ):
                 listener.exitIf_statement(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitIf_statement" ):
+                return visitor.visitIf_statement(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2675,6 +2855,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitUnless_statement" ):
                 listener.exitUnless_statement(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitUnless_statement" ):
+                return visitor.visitUnless_statement(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2780,6 +2966,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitWhile_statement" ):
                 listener.exitWhile_statement(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitWhile_statement" ):
+                return visitor.visitWhile_statement(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2861,6 +3053,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitFor_statement" ):
                 listener.exitFor_statement(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFor_statement" ):
+                return visitor.visitFor_statement(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2951,6 +3149,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitInit_expression" ):
                 listener.exitInit_expression(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitInit_expression" ):
+                return visitor.visitInit_expression(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3006,6 +3210,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitAll_assignment" ):
                 listener.exitAll_assignment(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitAll_assignment" ):
+                return visitor.visitAll_assignment(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3081,6 +3291,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitFor_init_list" ):
                 listener.exitFor_init_list(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFor_init_list" ):
+                return visitor.visitFor_init_list(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
     def for_init_list(self, _p:int=0):
@@ -3146,6 +3362,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitCond_expression" ):
                 listener.exitCond_expression(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCond_expression" ):
+                return visitor.visitCond_expression(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3185,6 +3407,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitLoop_expression" ):
                 listener.exitLoop_expression(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitLoop_expression" ):
+                return visitor.visitLoop_expression(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3232,6 +3460,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitFor_loop_list" ):
                 listener.exitFor_loop_list(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFor_loop_list" ):
+                return visitor.visitFor_loop_list(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3298,6 +3532,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitStatement_body" ):
                 listener.exitStatement_body(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitStatement_body" ):
+                return visitor.visitStatement_body(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3352,6 +3592,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitStatement_expression_list" ):
                 listener.exitStatement_expression_list(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitStatement_expression_list" ):
+                return visitor.visitStatement_expression_list(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3500,6 +3746,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitDynamic_assignment" ):
                 listener.exitDynamic_assignment(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDynamic_assignment" ):
+                return visitor.visitDynamic_assignment(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3597,6 +3849,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitInt_assignment" ):
                 listener.exitInt_assignment(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitInt_assignment" ):
+                return visitor.visitInt_assignment(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3700,6 +3958,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitFloat_assignment" ):
                 listener.exitFloat_assignment(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFloat_assignment" ):
+                return visitor.visitFloat_assignment(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3787,6 +4051,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitString_assignment" ):
                 listener.exitString_assignment(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitString_assignment" ):
+                return visitor.visitString_assignment(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3864,6 +4134,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitTable_assignment" ):
                 listener.exitTable_assignment(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitTable_assignment" ):
+                return visitor.visitTable_assignment(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3922,6 +4198,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitColumn_assignment" ):
                 listener.exitColumn_assignment(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitColumn_assignment" ):
+                return visitor.visitColumn_assignment(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3979,6 +4261,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitRow_assignment" ):
                 listener.exitRow_assignment(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitRow_assignment" ):
+                return visitor.visitRow_assignment(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4067,6 +4355,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitAssignment" ):
                 listener.exitAssignment(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitAssignment" ):
+                return visitor.visitAssignment(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4181,6 +4475,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitInitial_array_assignment" ):
                 listener.exitInitial_array_assignment(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitInitial_array_assignment" ):
+                return visitor.visitInitial_array_assignment(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -4237,6 +4537,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitArray_assignment" ):
                 listener.exitArray_assignment(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitArray_assignment" ):
+                return visitor.visitArray_assignment(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -4286,6 +4592,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitArray_definition" ):
                 listener.exitArray_definition(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitArray_definition" ):
+                return visitor.visitArray_definition(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4341,6 +4653,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitArray_definition_elements" ):
                 listener.exitArray_definition_elements(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitArray_definition_elements" ):
+                return visitor.visitArray_definition_elements(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4448,6 +4766,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitArray_selector" ):
                 listener.exitArray_selector(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitArray_selector" ):
+                return visitor.visitArray_selector(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4578,6 +4902,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitDynamic_result" ):
                 listener.exitDynamic_result(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDynamic_result" ):
+                return visitor.visitDynamic_result(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4859,6 +5189,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitDynamic" ):
                 listener.exitDynamic(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDynamic" ):
+                return visitor.visitDynamic(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -4961,6 +5297,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitInt_result" ):
                 listener.exitInt_result(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitInt_result" ):
+                return visitor.visitInt_result(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5162,6 +5504,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitFloat_result" ):
                 listener.exitFloat_result(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFloat_result" ):
+                return visitor.visitFloat_result(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5423,6 +5771,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitString_result" ):
                 listener.exitString_result(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitString_result" ):
+                return visitor.visitString_result(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
     def string_result(self, _p:int=0):
@@ -5571,6 +5925,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitTable_result" ):
                 listener.exitTable_result(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitTable_result" ):
+                return visitor.visitTable_result(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -5650,6 +6010,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitColumn_result" ):
                 listener.exitColumn_result(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitColumn_result" ):
+                return visitor.visitColumn_result(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5735,6 +6101,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitRow_result" ):
                 listener.exitRow_result(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitRow_result" ):
+                return visitor.visitRow_result(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5823,6 +6195,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitComparison_list" ):
                 listener.exitComparison_list(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitComparison_list" ):
+                return visitor.visitComparison_list(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5945,6 +6323,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitComparison" ):
                 listener.exitComparison(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitComparison" ):
+                return visitor.visitComparison(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -6027,6 +6411,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitComp_var" ):
                 listener.exitComp_var(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitComp_var" ):
+                return visitor.visitComp_var(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -6085,6 +6475,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitLvalue" ):
                 listener.exitLvalue(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitLvalue" ):
+                return visitor.visitLvalue(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6285,6 +6681,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitRvalue" ):
                 listener.exitRvalue(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitRvalue" ):
+                return visitor.visitRvalue(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6630,6 +7032,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitBreak_expression" ):
                 listener.exitBreak_expression(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitBreak_expression" ):
+                return visitor.visitBreak_expression(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -6668,6 +7076,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitLiteral_t" ):
                 listener.exitLiteral_t(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitLiteral_t" ):
+                return visitor.visitLiteral_t(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6708,6 +7122,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitFloat_t" ):
                 listener.exitFloat_t(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFloat_t" ):
+                return visitor.visitFloat_t(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -6746,6 +7166,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitInt_t" ):
                 listener.exitInt_t(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitInt_t" ):
+                return visitor.visitInt_t(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6788,6 +7214,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitBool_t" ):
                 listener.exitBool_t(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitBool_t" ):
+                return visitor.visitBool_t(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6834,6 +7266,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitNil_t" ):
                 listener.exitNil_t(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitNil_t" ):
+                return visitor.visitNil_t(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -6872,6 +7310,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitMy_id" ):
                 listener.exitMy_id(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMy_id" ):
+                return visitor.visitMy_id(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6912,6 +7356,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitId_global" ):
                 listener.exitId_global(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitId_global" ):
+                return visitor.visitId_global(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -6950,6 +7400,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitId_function" ):
                 listener.exitId_function(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitId_function" ):
+                return visitor.visitId_function(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6997,6 +7453,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitTerminator" ):
                 listener.exitTerminator(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitTerminator" ):
+                return visitor.visitTerminator(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7090,6 +7552,12 @@ class like_rubyParser ( Parser ):
             if hasattr( listener, "exitElse_token" ):
                 listener.exitElse_token(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitElse_token" ):
+                return visitor.visitElse_token(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -7128,6 +7596,12 @@ class like_rubyParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitCrlf" ):
                 listener.exitCrlf(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCrlf" ):
+                return visitor.visitCrlf(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
