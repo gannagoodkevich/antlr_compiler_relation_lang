@@ -310,16 +310,19 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#float_assignment.
   def visitFloat_assignment(self, ctx:like_rubyParser.Float_assignmentContext):
-    if self.function_name in self.memory:
-        if ctx in self.memory[self.function_name][1]["expressions"]:
-            self.memory[self.function_name][1]["expressions"].remove(ctx)
-            self.assignment = "float_assignment_" + str(id(ctx))
-            self.memory[self.function_name][1]["expressions"].append({self.assignment: []})
-            for exp in self.memory[self.function_name][1]["expressions"]:
-                if exp.__class__.__name__ == "dict" and self.assignment in exp:
-                    for child in ctx.children:
-                        if child.__class__.__name__ == "TerminalNodeImpl":
-                            exp[self.assignment].append(str(child))
+    attachment = self.memory[self.function_name][1]["expressions"] if self.function_name in self.memory else self.memory["programm"][0]["expressions"]
+    if ctx in attachment:
+        attachment.remove(ctx)
+        self.assignment = "float_assignment_" + str(id(ctx))
+        attachment.append({self.assignment: [{"float_result": []}]})
+        for exp in attachment:
+            if exp.__class__.__name__ == "dict" and self.assignment in exp:
+                for child in ctx.children:
+                    if child.__class__.__name__ == "TerminalNodeImpl":
+                        exp[self.assignment].append(str(child))
+                    else:
+                        if child.__class__.__name__ == "Float_resultContext":
+                            exp[self.assignment][0]["float_result"].append(child)
                         else:
                             exp[self.assignment].append(child)
     return self.visitChildren(ctx)
@@ -327,16 +330,19 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#string_assignment.
   def visitString_assignment(self, ctx:like_rubyParser.String_assignmentContext):
-    if self.function_name in self.memory:
-        if ctx in self.memory[self.function_name][1]["expressions"]:
-            self.memory[self.function_name][1]["expressions"].remove(ctx)
-            self.assignment = "float_assignment_" + str(id(ctx))
-            self.memory[self.function_name][1]["expressions"].append({self.assignment: []})
-            for exp in self.memory[self.function_name][1]["expressions"]:
-                if exp.__class__.__name__ == "dict" and self.assignment in exp:
-                    for child in ctx.children:
-                        if child.__class__.__name__ == "TerminalNodeImpl":
-                            exp[self.assignment].append(str(child))
+    attachment = self.memory[self.function_name][1]["expressions"] if self.function_name in self.memory else self.memory["programm"][0]["expressions"]
+    if ctx in attachment:
+        attachment.remove(ctx)
+        self.assignment = "string_assignment_" + str(id(ctx))
+        attachment.append({self.assignment: [{"string_result": []}]})
+        for exp in attachment:
+            if exp.__class__.__name__ == "dict" and self.assignment in exp:
+                for child in ctx.children:
+                    if child.__class__.__name__ == "TerminalNodeImpl":
+                        exp[self.assignment].append(str(child))
+                    else:
+                        if child.__class__.__name__ == "String_resultContext":
+                            exp[self.assignment][0]["string_result"].append(child)
                         else:
                             exp[self.assignment].append(child)
     return self.visitChildren(ctx)
@@ -399,28 +405,79 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#int_result.
   def visitInt_result(self, ctx:like_rubyParser.Int_resultContext):
-    if self.function_name in self.memory:
-        self.memory[self.function_name][1]["expressions"][self.assignment][0]["int_result"].remove(ctx)
-        # exp[self.assignment].append({"int_result": []})
-        print(self.memory[self.function_name][1]["expressions"][self.assignment][0]["int_result"])
-        for child in ctx.children:
-            self.memory[self.function_name][1]["expressions"][self.assignment][0]["int_result"].append(child)
-    else:
-        #self.memory["programm"][0]["expressions"][self.assignment][0]["int_result"].remove(ctx)
-        # exp[self.assignment].append({"int_result": []})
-        print(self.memory["programm"][0]["expressions"])
-        #for child in ctx.children:
-        #    self.memory["programm"][0]["expressions"][self.assignment][0]["int_result"].append(child)
+    attachment = self.memory[self.function_name][1]["expressions"] if self.function_name in self.memory else self.memory["programm"][0]["expressions"]
+    for exp in attachment:
+        if exp.__class__.__name__ == "dict":
+            if self.assignment in exp and "int_result" in exp[self.assignment][0]:
+                if ctx in exp[self.assignment][0]["int_result"]:
+                    exp[self.assignment][0]["int_result"].remove(ctx)
+                    for child in ctx.children:
+                        if child.__class__.__name__ == "TerminalNodeImpl":
+                            exp[self.assignment][0]["int_result"].append(str(child))
+                        else:
+                            if child.__class__.__name__ == "Int_tContext":
+                                exp[self.assignment][0]["int_result"].append(str(child.INT()))
+                            else:
+                                if child.__class__.__name__ == "Literal_tContext":
+                                    exp[self.assignment][0]["int_result"].append(str(child.LITERAL()))
+                                else:
+                                    if child.__class__.__name__ == "Int_tContext":
+                                        exp[self.assignment][0]["int_result"].append(str(child.INT()))
+                                    else:
+                                        if child.__class__.__name__ == "Float_tContext":
+                                            exp[self.assignment][0]["int_result"].append(str(child.FLOAT()))
+                                        else:
+                                            exp[self.assignment][0]["int_result"].append(child)
     return self.visitChildren(ctx)
 
 
   # Visit a parse tree produced by like_rubyParser#float_result.
   def visitFloat_result(self, ctx:like_rubyParser.Float_resultContext):
+    attachment = self.memory[self.function_name][1]["expressions"] if self.function_name in self.memory else self.memory["programm"][0]["expressions"]
+    for exp in attachment:
+        if exp.__class__.__name__ == "dict":
+            if self.assignment in exp:
+                if ctx in exp[self.assignment][0]["float_result"]:
+                    exp[self.assignment][0]["float_result"].remove(ctx)
+                    for child in ctx.children:
+                        if child.__class__.__name__ == "TerminalNodeImpl":
+                            exp[self.assignment][0]["float_result"].append(str(child))
+                        else:
+                            if child.__class__.__name__ == "Literal_tContext":
+                                exp[self.assignment][0]["float_result"].append(str(child.LITERAL()))
+                            else:
+                                if child.__class__.__name__ == "Int_tContext":
+                                    exp[self.assignment][0]["float_result"].append(str(child.INT()))
+                                else:
+                                    if child.__class__.__name__ == "Float_tContext":
+                                        exp[self.assignment][0]["float_result"].append(str(child.FLOAT()))
+                                    else:
+                                        exp[self.assignment][0]["float_result"].append(child)
     return self.visitChildren(ctx)
 
 
   # Visit a parse tree produced by like_rubyParser#string_result.
   def visitString_result(self, ctx:like_rubyParser.String_resultContext):
+    attachment = self.memory[self.function_name][1]["expressions"] if self.function_name in self.memory else self.memory["programm"][0]["expressions"]
+    for exp in attachment:
+        if exp.__class__.__name__ == "dict":
+            if self.assignment in exp:
+                if ctx in exp[self.assignment][0]["string_result"]:
+                    exp[self.assignment][0]["string_result"].remove(ctx)
+                    for child in ctx.children:
+                        if child.__class__.__name__ == "TerminalNodeImpl":
+                            exp[self.assignment][0]["string_result"].append(str(child))
+                        else:
+                            if child.__class__.__name__ == "Literal_tContext":
+                                exp[self.assignment][0]["string_result"].append(str(child.LITERAL()))
+                            else:
+                                if child.__class__.__name__ == "Int_tContext":
+                                    exp[self.assignment][0]["string_result"].append(str(child.INT()))
+                                else:
+                                    if child.__class__.__name__ == "Float_tContext":
+                                        exp[self.assignment][0]["string_result"].append(str(child.FLOAT()))
+                                    else:
+                                        exp[self.assignment][0]["string_result"].append(child)
     return self.visitChildren(ctx)
 
 

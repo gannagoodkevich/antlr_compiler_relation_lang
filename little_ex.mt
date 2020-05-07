@@ -9,7 +9,7 @@ Integer int = 1097 - 1
 
 def func1(a, b, c)
   Integer a = 10
-  Integer c = (Integer) column1
+  Integer c = (Integer) "12345"
   Float b = (Float) func1()
 end
 
