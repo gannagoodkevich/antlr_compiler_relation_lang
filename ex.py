@@ -13,7 +13,8 @@ def main(argv):
     #print(tree.toStringTree(recog=parser))
     visitor = Visitor()
     visitor.visit(tree)
-    print(visitor.memory)
+    # print(visitor.memory)
+    visitor.programm.print_info()
 
 if __name__ == '__main__':
     main(sys.argv)
