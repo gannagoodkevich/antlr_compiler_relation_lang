@@ -15,6 +15,8 @@ def main(argv):
     visitor.visit(tree)
     # print(visitor.memory)
     visitor.programm.print_info()
+    for func in visitor.programm.functions:
+        func.print_info()
 
 if __name__ == '__main__':
     main(sys.argv)
