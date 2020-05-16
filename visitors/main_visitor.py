@@ -7,9 +7,12 @@ from like_rubyVisitor import like_rubyVisitor
 from AST.AstProgramm import AstProgramm
 from AST.AstFunction import AstFunction
 from AST.AstIntAssignment import AstIntAssignment
+from AST.AstStringAssignment import AstStringAssignment
+from AST.AstFloatAssignment import AstFloatAssignment
 from AST.AstTableAssignment import AstTableAssignment
 from AST.AstColumnAssignment import AstColumnAssignment
 from AST.AstRowAssignment import AstRowAssignment
+from AST.AstFunctionCall import AstFunctionCall
 from like_rubyLexer import like_rubyLexer
 from like_rubyParser import like_rubyParser
 from namespace import Namespace
@@ -32,45 +35,29 @@ class Visitor(like_rubyVisitor):
     self.table_assignments = []
     self.column_assignments = []
     self.row_assignments = []
+    self.function_calls = []
 
   # Visit a parse tree produced by like_rubyParser#prog.
   def visitProg(self, ctx:like_rubyParser.ProgContext):
-    self.memory["programm"].append({"expressions" : []})
     return self.visitChildren(ctx)
 
   # Visit a parse tree produced by like_rubyParser#function_definition_list.
   def visitFunction_definition_list(self, ctx:like_rubyParser.Function_definition_listContext):
-    if ctx.function_definition_header().function_name().id_function() == None:
-        function_name = str(ctx.function_definition_header().function_name().my_id().ID())
-    else:
-        function_name = str(ctx.function_definition_header().function_name().id_function().ID())
-    if function_name in self.memory['declared_function_name']:
-        self.memory["errors"].append("Function declaretion error")
-    else:
-        self.memory['declared_function_name'].append(function_name)
+    for child in ctx.children:
+        if child.__class__.__name__ == "Function_definition_headerContext":
+            self.programm.declared_function_names.append(child)
     return self.visitChildren(ctx)
 
 
   # Visit a parse tree produced by like_rubyParser#expression_list.
   def visitExpression_list(self, ctx:like_rubyParser.Expression_listContext):
-    #if self.function_name in self.memory:
-    #    for exp in self.memory[self.function_name]:
-    #        if exp.__class__.__name__ == 'dict' and "expressions" in exp:
-    #            if ctx in exp["expressions"]:
-    #                exp["expressions"].remove(ctx)
-    #                for child in ctx.children:
-    #                    if child.__class__.__name__ != 'TerminatorContext':
-    #                        exp["expressions"].append(child)
-    #else:
-    #    for child in ctx.children:
-    #        if child.__class__.__name__ != 'TerminatorContext':
-    #            self.memory["programm"][0]["expressions"].append(child)
     for func in self.programm.functions:
         if ctx in func.expressions:
             func.expressions.remove(ctx)
             for child in ctx.children:
                 if child.__class__.__name__ != 'TerminatorContext':
                     func.expressions.append(child)
+            return self.visitChildren(ctx)
     if ctx in self.programm.expressions:
         self.programm.remove_expression(ctx)
         for child in ctx.children:
@@ -85,21 +72,6 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#expression.
   def visitExpression(self, ctx:like_rubyParser.ExpressionContext):
-    #if self.function_name in self.memory:
-    #    for exp in self.memory[self.function_name]:
-    #        if exp.__class__.__name__ == 'dict' and "expressions" in exp:
-    #            if ctx in exp["expressions"]:
-    #                exp["expressions"].remove(ctx)
-    #                for child in ctx.children:
-    #                    exp["expressions"].append(child)
-    #else:
-    #    if ctx in self.memory["programm"][0]["expressions"]:
-    #        print("HELP")
-    #        self.memory["programm"][0]["expressions"].remove(ctx)
-    #        for child in ctx.children:
-    #            self.memory["programm"][0]["expressions"].append(child)
-    #            print(child.__class__.__name__)
-    #if ctx in self.programm.expressions
     if ctx in self.programm.expressions:
         self.programm.remove_expression(ctx)
         for child in ctx.children:
@@ -131,6 +103,17 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#function_inline_call.
   def visitFunction_inline_call(self, ctx:like_rubyParser.Function_inline_callContext):
+    for func in self.programm.functions:
+        if ctx in func.expressions:
+            func.expressions.remove(ctx)
+            for child in ctx.children:
+                func.expressions.append(child)
+            return self.visitChildren(ctx)
+    if ctx in self.programm.expressions:
+        self.programm.expressions.remove(ctx)
+        for child in ctx.children:
+            self.programm.expressions.append(child)
+    #calling.print_info()
     return self.visitChildren(ctx)
 
 
@@ -151,40 +134,20 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#function_definition.
   def visitFunction_definition(self, ctx:like_rubyParser.Function_definitionContext):
-    #if ctx.function_definition_header().function_name().id_function() == None:
-    #    function_name = str(ctx.function_definition_header().function_name().my_id().ID())
-    #else:
-    #    function_name = str(ctx.function_definition_header().function_name().id_function().ID())
-    #if function_name in self.memory['declared_function_name']:
-    #    print("Okey, captain!")
-    #else:
-    #    self.memory["errors"].append("Function definition error: declare this function!")
-    #if function_name in self.memory['defined_function_name']:
-    #    self.memory["errors"].append("Hello function_name error")
-    #else:
-    #    if function_name in self.memory['local_values']:
-    #        self.memory["errors"].append("Hello function_name error: there is local_value with the same name")
-    #    else:
-    #        self.memory['defined_function_name'].append(function_name)
-    #if ctx.function_definition_body() != None:
-    #    body_name = function_name + "_body"
-    #    self.function_name = body_name
-    #    self.memory[body_name] = []
-    #    self.memory[body_name].append(ctx.function_definition_body())
     if ctx.function_definition_header().function_name().id_function() == None:
         function_name = str(ctx.function_definition_header().function_name().my_id().ID())
     else:
         function_name = str(ctx.function_definition_header().function_name().id_function().ID())
     if ctx in self.programm.expressions:
         self.programm.remove_expression(ctx)
-        if function_name in self.programm.declared_function_names or function_name in self.programm.local_variables:
+        if (not function_name in self.programm.declared_function_names) or (function_name in self.programm.local_variables):
             self.programm.errors.append("Hello function name error")
         else:
             function = AstFunction(function_name)
             self.programm.functions.append(function)
             self.function = function
             function.expressions.append(ctx.function_definition_body())
-            self.programm.declared_function_names.append(function_name)
+            self.programm.defined_function_names.append(function_name)
             function.function_params.append(ctx.function_definition_header().function_definition_params())
     return self.visitChildren(ctx)
 
@@ -206,6 +169,16 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#function_definition_header.
   def visitFunction_definition_header(self, ctx:like_rubyParser.Function_definition_headerContext):
+    if ctx in self.programm.declared_function_names:
+        self.programm.declared_function_names.remove(ctx)
+        if ctx.function_name().id_function() == None:
+            function_name = str(ctx.function_name().my_id().ID())
+        else:
+            function_name = str(ctx.function_name().id_function().ID())
+        if function_name in self.programm.declared_function_names:
+            self.programm.errors.append("Hello function declaretion error")
+        else:
+            self.programm.declared_function_names.append(function_name)
     return self.visitChildren(ctx)
 
 
@@ -272,55 +245,79 @@ class Visitor(like_rubyVisitor):
   def visitReturn_statement(self, ctx:like_rubyParser.Return_statementContext):
     return self.visitChildren(ctx)
 
-
+  #TODO check calling function in params of function!!!
   # Visit a parse tree produced by like_rubyParser#function_call.
   def visitFunction_call(self, ctx:like_rubyParser.Function_callContext):
     function_name = str(ctx.function_name().my_id().ID())
-    if not function_name in self.memory['defined_function_name']:
+    calling = AstFunctionCall()
+    self.function_calls.append(calling)
+    calling.name = function_name
+    if not function_name in self.programm.declared_function_names:
         error_text = "Hello function_call error: " + function_name # if function defined after function call this error will also occur
-        self.memory["errors"].append(error_text)
+        self.programm.errors.append(error_text)
+    else:
+        for func in self.programm.functions:
+            if ctx in func.expressions:
+                func.expressions.remove(ctx)
+                func.expressions.append(calling)
+                for child in ctx.children:
+                    if child.__class__.__name__ == "Function_call_param_listContext":
+                        calling.function_params.append(child)
+        if ctx in self.programm.expressions:
+            self.programm.expressions.remove(ctx)
+            self.programm.expressions.append(calling)
+            for child in ctx.children:
+                if child.__class__.__name__ == "Function_call_param_listContext":
+                    calling.function_params.append(child)
     return self.visitChildren(ctx)
 
 
   # Visit a parse tree produced by like_rubyParser#function_call_param_list.
   def visitFunction_call_param_list(self, ctx:like_rubyParser.Function_call_param_listContext):
-    if self.function_name in self.memory:
-        for exp_proto in self.memory[self.function_name]:
-            if exp_proto.__class__.__name__ == "dict" and "expressions" in exp_proto:
-                attachment = exp_proto["expressions"]
-    else:
-        attachment = self.memory["programm"][0]["expressions"]
-    #exp[self.assignment][0]["table_result"].append({'params': []})
-    for exp in attachment:
-        if exp.__class__.__name__ == "dict":
-            if self.assignment in exp:
-                if ctx in exp[self.assignment][0]["table_result"][0]['function_params']:
-                    exp[self.assignment][0]["table_result"][0]['function_params'].remove(ctx)
-                    for child in ctx.children:
-                        if child.__class__.__name__ == "TerminalNodeImpl":
-                            exp[self.assignment][0]["table_result"][0]['function_params'].append(str(child))
-                        else:
-                            exp[self.assignment][0]["table_result"][0]['function_params'].append(child)
+    for call in self.function_calls:
+        if ctx in call.function_params:
+            call.function_params.remove(ctx)
+            for child in ctx.children:
+                call.function_params.append(child)
     return self.visitChildren(ctx)
 
 
   # Visit a parse tree produced by like_rubyParser#function_call_params.
   def visitFunction_call_params(self, ctx:like_rubyParser.Function_call_paramsContext):
+    for call in self.function_calls:
+        if ctx in call.function_params:
+              call.function_params.remove(ctx)
+              for child in ctx.children:
+                  if child.__class__.__name__ != 'TerminalNodeImpl':
+                      call.function_params.append(child)
     return self.visitChildren(ctx)
 
 
   # Visit a parse tree produced by like_rubyParser#function_param.
   def visitFunction_param(self, ctx:like_rubyParser.Function_paramContext):
+    for call in self.function_calls:
+        if ctx in call.function_params:
+              call.function_params.remove(ctx)
+              for child in ctx.children:
+                  if child.__class__.__name__ != 'TerminalNodeImpl':
+                      call.function_params.append(child)
     return self.visitChildren(ctx)
 
 
   # Visit a parse tree produced by like_rubyParser#function_unnamed_param.
   def visitFunction_unnamed_param(self, ctx:like_rubyParser.Function_unnamed_paramContext):
+    for call in self.function_calls:
+        if ctx in call.function_params:
+              call.function_params.remove(ctx)
+              for child in ctx.children:
+                  if child.__class__.__name__ != 'TerminalNodeImpl':
+                      call.function_params.append(child)
     return self.visitChildren(ctx)
 
 
   # Visit a parse tree produced by like_rubyParser#function_named_param.
   def visitFunction_named_param(self, ctx:like_rubyParser.Function_named_paramContext):
+
     return self.visitChildren(ctx)
 
 
@@ -412,6 +409,7 @@ class Visitor(like_rubyVisitor):
   # Visit a parse tree produced by like_rubyParser#int_assignment.
   def visitInt_assignment(self, ctx:like_rubyParser.Int_assignmentContext):
     int_assignment = AstIntAssignment()
+    self.int_assignments.append(int_assignment)
     if ctx in self.programm.expressions:
         self.programm.expressions.remove(ctx)
         for child in ctx.children:
@@ -432,14 +430,22 @@ class Visitor(like_rubyVisitor):
                         if not child in int_assignment.value:
                             int_assignment.value.append(child)
             func.expressions.append(int_assignment)
-    int_assignment.print_info()
-    self.int_assignments.append(int_assignment)
+    for call in self.function_calls:
+        if ctx in call.function_params:
+            call.function_params.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != "TerminalNodeImpl":
+                    if child.__class__.__name__ == "LvalueContext":
+                        int_assignment.var = ctx.lvalue().my_id().ID()
+                    else:
+                        int_assignment.value.append(child)
+            call.function_params.append(int_assignment)
     return self.visitChildren(ctx)
 
 
   # Visit a parse tree produced by like_rubyParser#float_assignment.
   def visitFloat_assignment(self, ctx:like_rubyParser.Float_assignmentContext):
-    float_assignment = AstIntAssignment()
+    float_assignment = AstFloatAssignment()
     if ctx in self.programm.expressions:
         self.programm.expressions.remove(ctx)
         for child in ctx.children:
@@ -467,7 +473,7 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#string_assignment.
   def visitString_assignment(self, ctx:like_rubyParser.String_assignmentContext):
-    string_assignment = AstIntAssignment()
+    string_assignment = AstStringAssignment()
     if ctx in self.programm.expressions:
         self.programm.expressions.remove(ctx)
         for child in ctx.children:
@@ -614,6 +620,12 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#dynamic.
   def visitDynamic(self, ctx:like_rubyParser.DynamicContext):
+    for call in self.function_calls:
+        if ctx in call.function_params:
+              call.function_params.remove(ctx)
+              for child in ctx.children:
+                  if child.__class__.__name__ != 'TerminalNodeImpl':
+                      call.function_params.append(str(ctx.my_id().ID()))
     return self.visitChildren(ctx)
 
 
@@ -636,7 +648,12 @@ class Visitor(like_rubyVisitor):
                                 assignment.value.append(str(child.FLOAT()))
                             else:
                                 assignment.value.append(child)
-            assignment.print_info()
+    for call in self.function_calls:
+        if ctx in call.function_params:
+              call.function_params.remove(ctx)
+              for child in ctx.children:
+                  if child.__class__.__name__ != 'TerminalNodeImpl':
+                      call.function_params.append(child)
     return self.visitChildren(ctx)
 
 

@@ -2,7 +2,8 @@ class AstProgramm:
     def __init__(self):
         self.expressions = []
         self.local_variables = []
-        self.declared_function_names = []
+        self.declared_function_names = ['add_row', 'get_columns']
+        self.defined_function_names = []
         self.functions = []
         self.errors = []
 
@@ -13,6 +14,8 @@ class AstProgramm:
         print(self.local_variables)
         print("Declared functions:")
         print(self.declared_function_names)
+        print("Defined functions:")
+        print(self.defined_function_names)
         print("Funcitons:")
         print(self.functions)
         print("Errors:")
