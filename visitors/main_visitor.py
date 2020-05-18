@@ -13,6 +13,8 @@ from AST.AstTableAssignment import AstTableAssignment
 from AST.AstColumnAssignment import AstColumnAssignment
 from AST.AstRowAssignment import AstRowAssignment
 from AST.AstFunctionCall import AstFunctionCall
+from AST.AstForStatement import AstForStatement
+from AST.AstVariable import AstVariable
 from like_rubyLexer import like_rubyLexer
 from like_rubyParser import like_rubyParser
 from namespace import Namespace
@@ -35,7 +37,9 @@ class Visitor(like_rubyVisitor):
     self.table_assignments = []
     self.column_assignments = []
     self.row_assignments = []
+    self.assignments = []
     self.function_calls = []
+    self.for_statement = []
 
   # Visit a parse tree produced by like_rubyParser#prog.
   def visitProg(self, ctx:like_rubyParser.ProgContext):
@@ -83,6 +87,12 @@ class Visitor(like_rubyVisitor):
             for child in ctx.children:
                 if child.__class__.__name__ != 'TerminatorContext':
                     func.expressions.append(child)
+    for stat in self.for_statement:
+        if ctx in stat.expressions:
+            stat.expressions.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminatorContext':
+                    stat.expressions.append(child)
     return self.visitChildren(ctx)
 
 
@@ -108,6 +118,12 @@ class Visitor(like_rubyVisitor):
             func.expressions.remove(ctx)
             for child in ctx.children:
                 func.expressions.append(child)
+            return self.visitChildren(ctx)
+    for stat in self.for_statement:
+        if ctx in stat.expressions:
+            stat.expressions.remove(ctx)
+            for child in ctx.children:
+                stat.expressions.append(child)
             return self.visitChildren(ctx)
     if ctx in self.programm.expressions:
         self.programm.expressions.remove(ctx)
@@ -263,6 +279,13 @@ class Visitor(like_rubyVisitor):
                 for child in ctx.children:
                     if child.__class__.__name__ == "Function_call_param_listContext":
                         calling.function_params.append(child)
+        for func in self.for_statement:
+            if ctx in func.expressions:
+                func.expressions.remove(ctx)
+                func.expressions.append(calling)
+                for child in ctx.children:
+                    if child.__class__.__name__ == "Function_call_param_listContext":
+                        calling.function_params.append(child)
         if ctx in self.programm.expressions:
             self.programm.expressions.remove(ctx)
             self.programm.expressions.append(calling)
@@ -328,6 +351,14 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#all_result.
   def visitAll_result(self, ctx:like_rubyParser.All_resultContext):
+    for stat in self.for_statement:
+        if ctx in stat.end_value:
+            stat.end_value.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ =='TerminalNodeImpl':
+                    stat.end_value.append(str(child))
+                else:
+                    stat.end_value.append(child)
     return self.visitChildren(ctx)
 
 
@@ -358,21 +389,57 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#for_statement.
   def visitFor_statement(self, ctx:like_rubyParser.For_statementContext):
+    for_statement = AstForStatement()
+    if ctx in self.programm.expressions:
+        self.programm.expressions.remove(ctx)
+        self.programm.expressions.append(for_statement)
+        for child in ctx.children:
+            if child.__class__.__name__ != 'TerminalNodeImpl':
+                for_statement.start_value.append(child)
+            if child.__class__.__name__ == 'Statement_bodyContext':
+                for_statement.expressions.append(ctx.statement_body().statement_expression_list())
+                for_statement.start_value.remove(child)
+            if child.__class__.__name__ == 'Cond_expressionContext':
+                for comp in ctx.cond_expression().comparison_list().children:
+                    for_statement.end_value.append(comp)
+                    for_statement.start_value.remove(child)
+            if child.__class__.__name__ == 'Loop_expressionContext':
+                for_statement.end_value.append(child)
+                for_statement.start_value.remove(child)
+            if child.__class__.__name__ == 'CrlfContext':
+                for_statement.start_value.remove(child)
+    self.for_statement.append(for_statement)
     return self.visitChildren(ctx)
 
 
   # Visit a parse tree produced by like_rubyParser#init_expression.
   def visitInit_expression(self, ctx:like_rubyParser.Init_expressionContext):
+    for stat in self.for_statement:
+        if ctx in stat.start_value:
+            stat.start_value.remove(ctx)
+            for child in ctx.children:
+                stat.start_value.append(child)
+                print("LASJFBKJABFLSABFLASB___________")
+                stat.print_info()
     return self.visitChildren(ctx)
 
 
   # Visit a parse tree produced by like_rubyParser#all_assignment.
   def visitAll_assignment(self, ctx:like_rubyParser.All_assignmentContext):
+    for stat in self.for_statement:
+        if ctx in stat.end_value:
+            stat.end_value.remove(ctx)
+            for child in ctx.children:
+                stat.end_value.append(child)
     return self.visitChildren(ctx)
 
 
   # Visit a parse tree produced by like_rubyParser#for_init_list.
   def visitFor_init_list(self, ctx:like_rubyParser.For_init_listContext):
+    for stat in self.for_statement:
+        if ctx in stat.start_value:
+            stat.start_value.remove(ctx)
+            stat.start_value.append(ctx.all_assignment().children[0])
     return self.visitChildren(ctx)
 
 
@@ -383,11 +450,21 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#loop_expression.
   def visitLoop_expression(self, ctx:like_rubyParser.Loop_expressionContext):
+    for stat in self.for_statement:
+        if ctx in stat.end_value:
+            stat.end_value.remove(ctx)
+            for child in ctx.children:
+                stat.end_value.append(child)
     return self.visitChildren(ctx)
 
 
   # Visit a parse tree produced by like_rubyParser#for_loop_list.
   def visitFor_loop_list(self, ctx:like_rubyParser.For_loop_listContext):
+    for stat in self.for_statement:
+        if ctx in stat.end_value:
+            stat.end_value.remove(ctx)
+            for child in ctx.children:
+                stat.end_value.append(child)
     return self.visitChildren(ctx)
 
 
@@ -398,6 +475,14 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#statement_expression_list.
   def visitStatement_expression_list(self, ctx:like_rubyParser.Statement_expression_listContext):
+    for stat in self.for_statement:
+        if ctx in stat.expressions:
+            stat.expressions.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminatorContext':
+                    stat.expressions.append(child)
+        print("LASJFBKJABFLSABFLASB___________")
+        stat.print_info()
     return self.visitChildren(ctx)
 
 
@@ -440,6 +525,17 @@ class Visitor(like_rubyVisitor):
                     else:
                         int_assignment.value.append(child)
             call.function_params.append(int_assignment)
+    for stat in self.for_statement:
+        if ctx in stat.expressions:
+            stat.expressions.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminatorContext':
+                    if child.__class__.__name__ == "LvalueContext":
+                        int_assignment.var = ctx.lvalue().my_id().ID()
+                    else:
+                        if not child in int_assignment.value:
+                            int_assignment.value.append(child)
+            stat.expression.append(int_assignment)
     return self.visitChildren(ctx)
 
 
@@ -466,7 +562,27 @@ class Visitor(like_rubyVisitor):
                         if not child in float_assignment.value:
                             float_assignment.value.append(child)
             func.expressions.append(float_assignment)
-    float_assignment.print_info()
+    for call in self.function_calls:
+        if ctx in call.function_params:
+            call.function_params.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != "TerminalNodeImpl":
+                    if child.__class__.__name__ == "LvalueContext":
+                        float_assignment.var = ctx.lvalue().my_id().ID()
+                    else:
+                        float_assignment.value.append(child)
+            call.function_params.append(float_assignment)
+    for stat in self.for_statement:
+        if ctx in stat.expressions:
+            stat.expressions.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminatorContext':
+                    if child.__class__.__name__ == "LvalueContext":
+                        float_assignment.var = ctx.lvalue().my_id().ID()
+                    else:
+                        if not child in float_assignment.value:
+                            float_assignment.value.append(child)
+            stat.expression.append(float_assignment)
     self.float_assignments.append(float_assignment)
     return self.visitChildren(ctx)
 
@@ -494,7 +610,26 @@ class Visitor(like_rubyVisitor):
                         if not child in string_assignment.value:
                             string_assignment.value.append(child)
             func.expressions.append(string_assignment)
-    string_assignment.print_info()
+    for call in self.function_calls:
+        if ctx in call.function_params:
+            call.function_params.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != "TerminalNodeImpl":
+                    if child.__class__.__name__ == "LvalueContext":
+                        string_assignment.var = ctx.lvalue().my_id().ID()
+                    else:
+                        string_assignment.value.append(child)
+            call.function_params.append(string_assignment)
+    for stat in self.for_statement:
+        if ctx in stat.expressions:
+            stat.expressions.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != "TerminalNodeImpl":
+                    if child.__class__.__name__ == "LvalueContext":
+                        string_assignment.var = ctx.lvalue().my_id().ID()
+                    else:
+                        string_assignment.value.append(child)
+            stat.expressions.append(string_assignment)
     self.string_assignments.append(string_assignment)
     return self.visitChildren(ctx)
 
@@ -522,7 +657,27 @@ class Visitor(like_rubyVisitor):
                         if not child in string_assignment.columns:
                             string_assignment.columns.append(child)
             func.expressions.append(string_assignment)
-    string_assignment.print_info()
+    for call in self.function_calls:
+        if ctx in call.function_params:
+            call.function_params.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != "TerminalNodeImpl":
+                    if child.__class__.__name__ == "LvalueContext":
+                        string_assignment.var = ctx.lvalue().my_id().ID()
+                    else:
+                        string_assignment.value.append(child)
+            call.function_params.append(string_assignment)
+    for stat in self.for_statement:
+        if ctx in stat.expressions:
+            stat.expressions.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminatorContext':
+                    if child.__class__.__name__ == "LvalueContext":
+                        string_assignment.var = ctx.lvalue().my_id().ID()
+                    else:
+                        if not child in string_assignment.value:
+                            string_assignment.value.append(child)
+            stat.expression.append(string_assignment)
     self.table_assignments.append(string_assignment)
     return self.visitChildren(ctx)
 
@@ -550,7 +705,27 @@ class Visitor(like_rubyVisitor):
                         if not child in string_assignment.params:
                             string_assignment.params.append(child)
             func.expressions.append(string_assignment)
-    string_assignment.print_info()
+    for call in self.function_calls:
+        if ctx in call.function_params:
+            call.function_params.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != "TerminalNodeImpl":
+                    if child.__class__.__name__ == "LvalueContext":
+                        string_assignment.var = ctx.lvalue().my_id().ID()
+                    else:
+                        string_assignment.value.append(child)
+            call.function_params.append(string_assignment)
+    for stat in self.for_statement:
+        if ctx in stat.expressions:
+            stat.expressions.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminatorContext':
+                    if child.__class__.__name__ == "LvalueContext":
+                        string_assignment.var = ctx.lvalue().my_id().ID()
+                    else:
+                        if not child in string_assignment.value:
+                            string_assignment.value.append(child)
+            stat.expression.append(string_assignment)
     self.column_assignments.append(string_assignment)
     return self.visitChildren(ctx)
 
@@ -578,13 +753,59 @@ class Visitor(like_rubyVisitor):
                         if not child in string_assignment.params:
                             string_assignment.params.append(child)
             func.expressions.append(string_assignment)
-    string_assignment.print_info()
+    for call in self.function_calls:
+        if ctx in call.function_params:
+            call.function_params.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != "TerminalNodeImpl":
+                    if child.__class__.__name__ == "LvalueContext":
+                        string_assignment.var = ctx.lvalue().my_id().ID()
+                    else:
+                        string_assignment.value.append(child)
+            call.function_params.append(string_assignment)
+    for stat in self.for_statement:
+        if ctx in stat.expressions:
+            stat.expressions.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminatorContext':
+                    if child.__class__.__name__ == "LvalueContext":
+                        string_assignment.var = ctx.lvalue().my_id().ID()
+                    else:
+                        if not child in string_assignment.value:
+                            string_assignment.value.append(child)
+            stat.expression.append(string_assignment)
     self.row_assignments.append(string_assignment)
     return self.visitChildren(ctx)
 
 
   # Visit a parse tree produced by like_rubyParser#assignment.
   def visitAssignment(self, ctx:like_rubyParser.AssignmentContext):
+    for stat in self.for_statement:
+        if ctx in stat.start_value:
+            stat.start_value.remove(ctx)
+            for child in ctx.children:
+                stat.start_value.append(child)
+    for stat in self.for_statement:
+        if ctx in stat.end_value:
+            stat.end_value.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != "TerminalNodeImpl":
+                    stat.end_value.append(child)
+                else:
+                    stat.end_value.append(str(child))
+        if ctx in stat.expressions:
+            assignment = AstVariable()
+            stat.expressions.remove(ctx)
+            stat.expressions.append(assignment)
+            self.assignments.append(assignment)
+            for child in ctx.children:
+                if child.__class__.__name__ != "TerminalNodeImpl":
+                    assignment.value.append(child)
+                else:
+                    assignment.value.append(str(child))
+                    if str(child) == '=' or str(child) == '+=' or str(child) == '-=' or str(child) == '*=' or str(child) == '/=':
+                        assignment.operator = (str(child))
+                        assignment.value.remove(str(child))
     return self.visitChildren(ctx)
 
 
@@ -626,6 +847,12 @@ class Visitor(like_rubyVisitor):
               for child in ctx.children:
                   if child.__class__.__name__ != 'TerminalNodeImpl':
                       call.function_params.append(str(ctx.my_id().ID()))
+    for stat in self.for_statement:
+        if ctx in stat.end_value:
+            stat.end_value.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminalNodeImpl':
+                    stat.end_value.append(str(ctx.my_id().ID()))
     return self.visitChildren(ctx)
 
 
@@ -654,6 +881,56 @@ class Visitor(like_rubyVisitor):
               for child in ctx.children:
                   if child.__class__.__name__ != 'TerminalNodeImpl':
                       call.function_params.append(child)
+    for assign in self.assignments:
+        if ctx in assign.value:
+            assign.value.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ == "TerminalNodeImpl":
+                    assign.value.append(str(child))
+                else:
+                    if child.__class__.__name__ == "Literal_tContext":
+                        assign.value.append(str(child.LITERAL()))
+                    else:
+                        if child.__class__.__name__ == "Int_tContext":
+                            assign.value.append(str(child.INT()))
+                        else:
+                            if child.__class__.__name__ == "Float_tContext":
+                                assign.value.append(str(child.FLOAT()))
+                            else:
+                                assign.value.append(child)
+    for stat in self.for_statement:
+        if ctx in stat.start_value:
+            stat.start_value.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ == "TerminalNodeImpl":
+                    stat.start_value.append(str(child))
+                else:
+                    if child.__class__.__name__ == "Literal_tContext":
+                        stat.start_value.append(str(child.LITERAL()))
+                    else:
+                        if child.__class__.__name__ == "Int_tContext":
+                            stat.start_value.append(str(child.INT()))
+                        else:
+                            if child.__class__.__name__ == "Float_tContext":
+                                stat.start_value.append(str(child.FLOAT()))
+                            else:
+                                stat.start_value.append(child)
+        if ctx in stat.end_value:
+            stat.end_value.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ == "TerminalNodeImpl":
+                    stat.end_value.append(str(child))
+                else:
+                    if child.__class__.__name__ == "Literal_tContext":
+                        stat.end_value.append(str(child.LITERAL()))
+                    else:
+                        if child.__class__.__name__ == "Int_tContext":
+                            stat.end_value.append(str(child.INT()))
+                        else:
+                            if child.__class__.__name__ == "Float_tContext":
+                                stat.end_value.append(str(child.FLOAT()))
+                            else:
+                                stat.end_value.append(child)
     return self.visitChildren(ctx)
 
 
@@ -698,6 +975,25 @@ class Visitor(like_rubyVisitor):
                                 assignment.value.append(str(child.FLOAT()))
                             else:
                                 assignment.value.append(child)
+    for assign in self.assignments:
+        if ctx in assign.value:
+            assign.value.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ == "TerminalNodeImpl":
+                    assign.value.append(str(child))
+                else:
+                    if child.__class__.__name__ == "Literal_tContext":
+                        assign.value.append(str(child.LITERAL()))
+                    else:
+                        if child.__class__.__name__ == "Int_tContext":
+                            assign.value.append(str(child.INT()))
+                        else:
+                            if child.__class__.__name__ == "Float_tContext":
+                                assign.value.append(str(child.FLOAT()))
+                            else:
+                                assign.value.append(child)
+        print("-----------------------------------------000000000")
+        assign.print_info()
     return self.visitChildren(ctx)
 
 
@@ -755,49 +1051,54 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#comparison.
   def visitComparison(self, ctx:like_rubyParser.ComparisonContext):
+    for stat in self.for_statement:
+        if ctx in stat.end_value:
+            stat.end_value.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ =='TerminalNodeImpl':
+                    stat.end_value.append(str(child))
+                else:
+                    stat.end_value.append(child)
     return self.visitChildren(ctx)
 
 
   # Visit a parse tree produced by like_rubyParser#comp_var.
   def visitComp_var(self, ctx:like_rubyParser.Comp_varContext):
+    for stat in self.for_statement:
+        if ctx in stat.end_value:
+            stat.end_value.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ =='TerminalNodeImpl':
+                    stat.end_value.append(str(child))
+                else:
+                    stat.end_value.append(child)
     return self.visitChildren(ctx)
 
 
   # Visit a parse tree produced by like_rubyParser#lvalue.
   def visitLvalue(self, ctx:like_rubyParser.LvalueContext):
      var_name = ctx.my_id().ID()
-     #if self.function_name in self.memory:
-    #     for exp_proto in self.memory[self.function_name]:
-    #         if exp_proto.__class__.__name__ == "dict" and "expressions" in exp_proto:
-    #             for exp in exp_proto["expressions"]:
-    #                 if exp.__class__.__name__ == "dict" and self.assignment in exp and ctx in exp[self.assignment]:
-    #                     exp[self.assignment].remove(ctx)
-    #                     if str(var_name) in self.memory['defined_function_name']:
-    #                         self.memory["errors"].append("Hello local_values error: there is function with the same name")
-    #                     else:
-    #                         exp[self.assignment].append(str(var_name))
-    #                         for exp_func in self.memory[self.function_name]:
-    #                             if exp_func.__class__.__name__ == "dict" and "func1_variables" in exp_func:
-    #                                 exp_func["func1_variables"].append(str(var_name))
-     #else:
-    #    for exp in self.memory["programm"][0]["expressions"]:
-    #        if exp.__class__.__name__ == "dict" and self.assignment in exp and ctx in exp[self.assignment]:
-    #            exp[self.assignment].remove(ctx)
-    #            if str(var_name) in self.memory['defined_function_name']:
-    #                self.memory["errors"].append("Hello local_values error: there is function with the same name")
-    #            else:
-    #                exp[self.assignment].append(str(var_name))
-    #    if str(var_name) in self.memory['local_values']:
-    #        self.memory["errors"].append("Hello local_values error")
-    #    else:
-    #        if str(var_name) in self.memory['defined_function_name']:
-    #            self.memory["errors"].append("Hello local_values error: there is function with the same name")
-    #        else:
-    #            self.memory['local_values'].append(str(var_name))
      if var_name in self.programm.local_variables or var_name in self.programm.declared_function_names:
          self.programm.errors.append("Hello local_values error")
      else:
          self.programm.local_variables.append(str(var_name))
+     for stat in self.for_statement:
+         if ctx in stat.start_value:
+             stat.start_value.remove(ctx)
+             for child in ctx.children:
+                 if child.__class__.__name__ != 'TerminatorContext':
+                     stat.var = (str(child.ID()))
+         if ctx in stat.end_value:
+             stat.end_value.remove(ctx)
+             for child in ctx.children:
+                 if child.__class__.__name__ != 'TerminatorContext':
+                     stat.end_value.append(str(child.ID()))
+     for assign in self.assignments:
+         if ctx in assign.value:
+             assign.value.remove(ctx)
+             for child in ctx.children:
+                 if child.__class__.__name__ != "TerminalNodeImpl":
+                     assign.name = var_name
      return self.visitChildren(ctx)
 
 
@@ -814,6 +1115,30 @@ class Visitor(like_rubyVisitor):
             for child in ctx.children:
                 if child.__class__.__name__ != 'TerminatorContext':
                     func.expressions.append(child)
+    for stat in self.for_statement:
+        if ctx in stat.start_value:
+            stat.start_value.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminatorContext':
+                    stat.start_value.append(child)
+        if ctx in stat.end_value:
+            stat.end_value.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != "TerminalNodeImpl":
+                    stat.end_value.append(child)
+        if ctx in stat.expressions:
+            stat.expressions.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != "TerminalNodeImpl":
+                    stat.expressions.append(child)
+    for assign in self.assignments:
+        if ctx in assign.value:
+            assign.value.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != "TerminalNodeImpl":
+                    assign.value.append(child)
+        print("-----------------------------------------000000000")
+        assign.print_info()
     return self.visitChildren(ctx)
 
 
