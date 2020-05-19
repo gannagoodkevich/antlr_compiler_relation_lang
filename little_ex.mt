@@ -6,6 +6,12 @@ String new_str = (String) 200
 
 Column column1 = Column.new("name1", Integer)
 Table table1 = Table.new(column1)
+value = []
+value[0] = 1
+value[1] = asr
+value[2] = "hahaha"
+arr = []
+arr[0] = somethhing
 Row row1 = Row.new(get_columns(table1), value)
 add_row(table1, row1)
 func1(column1, column2, column3)

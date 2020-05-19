@@ -15,6 +15,7 @@ from AST.AstRowAssignment import AstRowAssignment
 from AST.AstFunctionCall import AstFunctionCall
 from AST.AstForStatement import AstForStatement
 from AST.AstVariable import AstVariable
+from AST.AstArray import AstArray
 from AST.AstIfStatement import AstIfStatement
 from like_rubyLexer import like_rubyLexer
 from like_rubyParser import like_rubyParser
@@ -38,6 +39,7 @@ class Visitor(like_rubyVisitor):
     self.table_assignments = []
     self.column_assignments = []
     self.row_assignments = []
+    self.arrays = []
     self.assignments = []
     self.function_calls = []
     self.for_statement = []
@@ -420,6 +422,16 @@ class Visitor(like_rubyVisitor):
                     stat.var.append(str(child))
                 else:
                     stat.var.append(child)
+    for assignment in self.arrays:
+        if ctx in assignment.elements:
+            assignment.elements.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ =='TerminalNodeImpl':
+                    assignment.elements.append(str(child))
+                else:
+                    assignment.elements.append(child)
+        print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
+        assignment.print_info()
     return self.visitChildren(ctx)
 
 
@@ -951,11 +963,78 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#initial_array_assignment.
   def visitInitial_array_assignment(self, ctx:like_rubyParser.Initial_array_assignmentContext):
+    float_assignment = AstArray()
+    if ctx in self.programm.expressions:
+        self.programm.expressions.remove(ctx)
+        for child in ctx.children:
+            if child.__class__.__name__ != "TerminalNodeImpl":
+                if child.__class__.__name__ == "LvalueContext":
+                    float_assignment.name = ctx.lvalue().my_id().ID()
+        self.programm.expressions.append(float_assignment)
+    for func in self.programm.functions:
+        if ctx in func.expressions:
+            func.expressions.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != "TerminalNodeImpl":
+                    if child.__class__.__name__ == "LvalueContext":
+                        float_assignment.name = ctx.lvalue().my_id().ID()
+            func.expressions.append(float_assignment)
+    for call in self.function_calls:
+        if ctx in call.function_params:
+            call.function_params.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != "TerminalNodeImpl":
+                    if child.__class__.__name__ == "LvalueContext":
+                        float_assignment.name = ctx.lvalue().my_id().ID()
+            call.function_params.append(float_assignment)
+    for stat in self.for_statement:
+        if ctx in stat.expressions:
+            stat.expressions.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminatorContext':
+                    if child.__class__.__name__ == "LvalueContext":
+                        float_assignment.name = ctx.lvalue().my_id().ID()
+            stat.expression.append(float_assignment)
+    self.arrays.append(float_assignment)
     return self.visitChildren(ctx)
 
-
+  # Name check!!!
   # Visit a parse tree produced by like_rubyParser#array_assignment.
   def visitArray_assignment(self, ctx:like_rubyParser.Array_assignmentContext):
+    for assignment in self.arrays:
+        if str(ctx.array_selector().my_id().ID()) == str(assignment.name):
+            if ctx in self.programm.expressions:
+                self.programm.expressions.remove(ctx)
+                for child in ctx.children:
+                    if child.__class__.__name__ != 'TerminalNodeImpl':
+                        assignment.elements.append(child)
+            for func in self.programm.functions:
+                if ctx in func.expressions:
+                    func.expressions.remove(ctx)
+                    for child in ctx.children:
+                        if child.__class__.__name__ == 'TerminalNodeImpl':
+                            assignment.elements.append(str(child))
+                        else:
+                            assignment.elements.append(child)
+                    func.expressions.append(float_assignment)
+            for call in self.function_calls:
+                if ctx in call.function_params:
+                    call.function_params.remove(ctx)
+                    for child in ctx.children:
+                        if child.__class__.__name__ == 'TerminalNodeImpl':
+                            assignment.elements.append(str(child))
+                        else:
+                            assignment.elements.append(child)
+                    call.function_params.append(float_assignment)
+            for stat in self.for_statement:
+                if ctx in stat.expressions:
+                    stat.expressions.remove(ctx)
+                    for child in ctx.children:
+                        if child.__class__.__name__ == 'TerminalNodeImpl':
+                            assignment.elements.append(str(child))
+                        else:
+                            assignment.elements.append(child)
+                    stat.expression.append(float_assignment)
     return self.visitChildren(ctx)
 
 
@@ -971,6 +1050,18 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#array_selector.
   def visitArray_selector(self, ctx:like_rubyParser.Array_selectorContext):
+    for assignment in self.arrays:
+        if ctx in assignment.elements:
+            assignment.elements.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminalNodeImpl':
+                    if child.__class__.__name__ != 'My_idContext':
+                        if child.__class__.__name__ == 'All_resultContext':
+                            assignment.elements.append(child)
+                        if child.__class__.__name__ == 'Int_resultContext':
+                            assignment.indexes.append(child)
+        #print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        #assignment.print_info()
     return self.visitChildren(ctx)
 
 
@@ -999,8 +1090,15 @@ class Visitor(like_rubyVisitor):
             for child in ctx.children:
                 if child.__class__.__name__ != 'TerminalNodeImpl':
                     stat.var.append(str(ctx.my_id().ID()))
-        print("LASJFBKJABFLSABFLASB___________")
-        stat.print_info()
+    for stat in self.arrays:
+        if ctx in stat.elements:
+            stat.elements.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminalNodeImpl':
+                    if str(ctx.my_id().ID()) in self.programm.local_variables:
+                        stat.elements.append(str(ctx.my_id().ID()))
+                    else:
+                        self.programm.errors.append("Hello variable error")
     return self.visitChildren(ctx)
 
 
@@ -1112,6 +1210,39 @@ class Visitor(like_rubyVisitor):
                                 stat.condition.append(str(child.FLOAT()))
                             else:
                                 stat.condition.append(child)
+    for assignment in self.arrays:
+        if ctx in assignment.indexes:
+            assignment.indexes.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ == "TerminalNodeImpl":
+                    assignment.indexes.append(str(child))
+                else:
+                    if child.__class__.__name__ == "Literal_tContext":
+                        assignment.indexes.append(str(child.LITERAL()))
+                    else:
+                        if child.__class__.__name__ == "Int_tContext":
+                            assignment.indexes.append(str(child.INT()))
+                        else:
+                            if child.__class__.__name__ == "Float_tContext":
+                                assignment.indexes.append(str(child.FLOAT()))
+                            else:
+                                assignment.indexes.append(child)
+        if ctx in assignment.elements:
+            assignment.elements.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ == "TerminalNodeImpl":
+                    assignment.elements.append(str(child))
+                else:
+                    if child.__class__.__name__ == "Literal_tContext":
+                        assignment.elements.append(str(child.LITERAL()))
+                    else:
+                        if child.__class__.__name__ == "Int_tContext":
+                            assignment.elements.append(str(child.INT()))
+                        else:
+                            if child.__class__.__name__ == "Float_tContext":
+                                assignment.elements.append(str(child.FLOAT()))
+                            else:
+                                assignment.elements.append(child)
     return self.visitChildren(ctx)
 
 
@@ -1134,6 +1265,23 @@ class Visitor(like_rubyVisitor):
                                 assignment.value.append(str(child.FLOAT()))
                             else:
                                 assignment.value.append(child)
+    for assignment in self.arrays:
+        if ctx in assignment.elements:
+            assignment.elements.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ == "TerminalNodeImpl":
+                    assignment.elements.append(str(child))
+                else:
+                    if child.__class__.__name__ == "Literal_tContext":
+                        assignment.elements.append(str(child.LITERAL()))
+                    else:
+                        if child.__class__.__name__ == "Int_tContext":
+                            assignment.elements.append(str(child.INT()))
+                        else:
+                            if child.__class__.__name__ == "Float_tContext":
+                                assignment.elements.append(str(child.FLOAT()))
+                            else:
+                                assignment.elements.append(child)
     return self.visitChildren(ctx)
 
 
@@ -1173,6 +1321,23 @@ class Visitor(like_rubyVisitor):
                                 assign.value.append(str(child.FLOAT()))
                             else:
                                 assign.value.append(child)
+    for assign in self.arrays:
+        if ctx in assign.elements:
+            assign.elements.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ == "TerminalNodeImpl":
+                    assign.elements.append(str(child))
+                else:
+                    if child.__class__.__name__ == "Literal_tContext":
+                        assign.elements.append(str(child.LITERAL()))
+                    else:
+                        if child.__class__.__name__ == "Int_tContext":
+                            assign.elements.append(str(child.INT()))
+                        else:
+                            if child.__class__.__name__ == "Float_tContext":
+                                assign.elements.append(str(child.FLOAT()))
+                            else:
+                                assign.elements.append(child)
     return self.visitChildren(ctx)
 
 
