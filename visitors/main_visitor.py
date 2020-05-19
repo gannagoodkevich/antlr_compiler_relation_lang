@@ -15,6 +15,7 @@ from AST.AstRowAssignment import AstRowAssignment
 from AST.AstFunctionCall import AstFunctionCall
 from AST.AstForStatement import AstForStatement
 from AST.AstVariable import AstVariable
+from AST.AstIfStatement import AstIfStatement
 from like_rubyLexer import like_rubyLexer
 from like_rubyParser import like_rubyParser
 from namespace import Namespace
@@ -40,6 +41,7 @@ class Visitor(like_rubyVisitor):
     self.assignments = []
     self.function_calls = []
     self.for_statement = []
+    self.if_statements = []
 
   # Visit a parse tree produced by like_rubyParser#prog.
   def visitProg(self, ctx:like_rubyParser.ProgContext):
@@ -93,6 +95,19 @@ class Visitor(like_rubyVisitor):
             for child in ctx.children:
                 if child.__class__.__name__ != 'TerminatorContext':
                     stat.expressions.append(child)
+    for stat in self.if_statements:
+        if ctx in stat.if_expressions:
+            stat.if_expressions.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminatorContext':
+                    stat.if_expressions.append(child)
+        if ctx in stat.else_expressions:
+            stat.else_expressions.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminatorContext':
+                    stat.else_expressions.append(child)
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAA--AAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        stat.print_info()
     return self.visitChildren(ctx)
 
 
@@ -125,11 +140,20 @@ class Visitor(like_rubyVisitor):
             for child in ctx.children:
                 stat.expressions.append(child)
             return self.visitChildren(ctx)
+    for stat in self.if_statements:
+        if ctx in stat.if_expressions:
+            stat.if_expressions.remove(ctx)
+            for child in ctx.children:
+                stat.if_expressions.append(child)
+        if ctx in stat.else_expressions:
+            stat.else_expressions.remove(ctx)
+            for child in ctx.children:
+                stat.else_expressions.append(child)
+            return self.visitChildren(ctx)
     if ctx in self.programm.expressions:
         self.programm.expressions.remove(ctx)
         for child in ctx.children:
             self.programm.expressions.append(child)
-    #calling.print_info()
     return self.visitChildren(ctx)
 
 
@@ -170,11 +194,6 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#function_definition_body.
   def visitFunction_definition_body(self, ctx:like_rubyParser.Function_definition_bodyContext):
-    #if self.function_name in self.memory:
-    #    if ctx in self.memory[self.function_name]:
-    #        self.memory[self.function_name].append({"expressions": ctx.children})
-    #func_vars = self.function_name + "_variables"
-    #self.memory[self.function_name].append({func_vars: []})
     for func in self.programm.functions:
         if ctx in func.expressions:
             func.expressions.remove(ctx)
@@ -286,6 +305,19 @@ class Visitor(like_rubyVisitor):
                 for child in ctx.children:
                     if child.__class__.__name__ == "Function_call_param_listContext":
                         calling.function_params.append(child)
+        for func in self.if_statements:
+            if ctx in func.if_expressions:
+                func.if_expressions.remove(ctx)
+                func.if_expressions.append(calling)
+                for child in ctx.children:
+                    if child.__class__.__name__ == "Function_call_param_listContext":
+                        calling.function_params.append(child)
+            if ctx in func.else_expressions:
+                func.else_expressions.remove(ctx)
+                func.else_expressions.append(calling)
+                for child in ctx.children:
+                    if child.__class__.__name__ == "Function_call_param_listContext":
+                        calling.function_params.append(child)
         if ctx in self.programm.expressions:
             self.programm.expressions.remove(ctx)
             self.programm.expressions.append(calling)
@@ -359,6 +391,21 @@ class Visitor(like_rubyVisitor):
                     stat.end_value.append(str(child))
                 else:
                     stat.end_value.append(child)
+    for stat in self.if_statements:
+        if ctx in stat.condition:
+            stat.condition.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ =='TerminalNodeImpl':
+                    stat.condition.append(str(child))
+                else:
+                    stat.condition.append(child)
+        if ctx in stat.var:
+            stat.var.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ =='TerminalNodeImpl':
+                    stat.var.append(str(child))
+                else:
+                    stat.var.append(child)
     return self.visitChildren(ctx)
 
 
@@ -374,6 +421,34 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#if_statement.
   def visitIf_statement(self, ctx:like_rubyParser.If_statementContext):
+    if_statement = AstIfStatement()
+    self.if_statements.append(if_statement)
+    for func in self.programm.functions:
+        if ctx in func.expressions:
+            func.expressions.remove(ctx)
+            func.expressions.append(if_statement)
+            for child in ctx.children:
+                if_statement.condition.append(child)
+            return self.visitChildren(ctx)
+    if ctx in self.programm.expressions:
+        self.programm.expressions.remove(ctx)
+        self.programm.expressions.append(if_statement)
+        for child in ctx.children:
+            if child.__class__.__name__ != 'TerminalNodeImpl':
+                if_statement.condition.append(child)
+            if child.__class__.__name__ == 'Statement_bodyContext':
+                if len(if_statement.if_expressions) == 0:
+                    if_statement.if_expressions.append(child)
+                else:
+                    if_statement.else_expressions.append(child)
+                if_statement.condition.remove(child)
+            if child.__class__.__name__ == 'Cond_expressionContext':
+                if_statement.condition.remove(child)
+                if_statement.condition.append(ctx.cond_expression().comparison_list())
+            if child.__class__.__name__ == 'CrlfContext' or child.__class__.__name__ == 'Else_tokenContext':
+                if_statement.condition.remove(child)
+        #print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        #if_statement.print_info()
     return self.visitChildren(ctx)
 
 
@@ -419,8 +494,6 @@ class Visitor(like_rubyVisitor):
             stat.start_value.remove(ctx)
             for child in ctx.children:
                 stat.start_value.append(child)
-                print("LASJFBKJABFLSABFLASB___________")
-                stat.print_info()
     return self.visitChildren(ctx)
 
 
@@ -431,6 +504,11 @@ class Visitor(like_rubyVisitor):
             stat.end_value.remove(ctx)
             for child in ctx.children:
                 stat.end_value.append(child)
+    #for stat in self.if_statements:
+        #if ctx in stat.condition:
+            #stat.condition.remove(ctx)
+            #for child in ctx.children:
+                #stat.condition.append(child)
     return self.visitChildren(ctx)
 
 
@@ -445,6 +523,7 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#cond_expression.
   def visitCond_expression(self, ctx:like_rubyParser.Cond_expressionContext):
+
     return self.visitChildren(ctx)
 
 
@@ -470,6 +549,15 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#statement_body.
   def visitStatement_body(self, ctx:like_rubyParser.Statement_bodyContext):
+    for stat in self.if_statements:
+        if ctx in stat.if_expressions:
+            stat.if_expressions.remove(ctx)
+            for child in ctx.children:
+                stat.if_expressions.append(child)
+        if ctx in stat.else_expressions:
+            stat.else_expressions.remove(ctx)
+            for child in ctx.children:
+                stat.else_expressions.append(child)
     return self.visitChildren(ctx)
 
 
@@ -481,8 +569,19 @@ class Visitor(like_rubyVisitor):
             for child in ctx.children:
                 if child.__class__.__name__ != 'TerminatorContext':
                     stat.expressions.append(child)
-        print("LASJFBKJABFLSABFLASB___________")
-        stat.print_info()
+    for stat in self.if_statements:
+        if ctx in stat.if_expressions:
+            stat.if_expressions.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminatorContext':
+                    stat.if_expressions.append(child)
+        if ctx in stat.else_expressions:
+            stat.else_expressions.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminatorContext':
+                    stat.else_expressions.append(child)
+        #print("LASJFBKJABFLSABFLASB___________")
+        #stat.print_info()
     return self.visitChildren(ctx)
 
 
@@ -806,6 +905,33 @@ class Visitor(like_rubyVisitor):
                     if str(child) == '=' or str(child) == '+=' or str(child) == '-=' or str(child) == '*=' or str(child) == '/=':
                         assignment.operator = (str(child))
                         assignment.value.remove(str(child))
+    for stat in self.if_statements:
+        if ctx in stat.if_expressions:
+            assignment = AstVariable()
+            stat.if_expressions.remove(ctx)
+            stat.if_expressions.append(assignment)
+            self.assignments.append(assignment)
+            for child in ctx.children:
+                if child.__class__.__name__ != "TerminalNodeImpl":
+                    assignment.value.append(child)
+                else:
+                    assignment.value.append(str(child))
+                    if str(child) == '=' or str(child) == '+=' or str(child) == '-=' or str(child) == '*=' or str(child) == '/=':
+                        assignment.operator = (str(child))
+                        assignment.value.remove(str(child))
+        if ctx in stat.else_expressions:
+            assignment = AstVariable()
+            stat.else_expressions.remove(ctx)
+            stat.else_expressions.append(assignment)
+            self.assignments.append(assignment)
+            for child in ctx.children:
+                if child.__class__.__name__ != "TerminalNodeImpl":
+                    assignment.value.append(child)
+                else:
+                    assignment.value.append(str(child))
+                    if str(child) == '=' or str(child) == '+=' or str(child) == '-=' or str(child) == '*=' or str(child) == '/=':
+                        assignment.operator = (str(child))
+                        assignment.value.remove(str(child))
     return self.visitChildren(ctx)
 
 
@@ -853,6 +979,14 @@ class Visitor(like_rubyVisitor):
             for child in ctx.children:
                 if child.__class__.__name__ != 'TerminalNodeImpl':
                     stat.end_value.append(str(ctx.my_id().ID()))
+    for stat in self.if_statements:
+        if ctx in stat.var:
+            stat.var.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminalNodeImpl':
+                    stat.var.append(str(ctx.my_id().ID()))
+        print("LASJFBKJABFLSABFLASB___________")
+        stat.print_info()
     return self.visitChildren(ctx)
 
 
@@ -931,6 +1065,39 @@ class Visitor(like_rubyVisitor):
                                 stat.end_value.append(str(child.FLOAT()))
                             else:
                                 stat.end_value.append(child)
+    for stat in self.if_statements:
+        if ctx in stat.var:
+            stat.var.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ == "TerminalNodeImpl":
+                    stat.var.append(str(child))
+                else:
+                    if child.__class__.__name__ == "Literal_tContext":
+                        stat.var.append(str(child.LITERAL()))
+                    else:
+                        if child.__class__.__name__ == "Int_tContext":
+                            stat.var.append(str(child.INT()))
+                        else:
+                            if child.__class__.__name__ == "Float_tContext":
+                                stat.var.append(str(child.FLOAT()))
+                            else:
+                                stat.var.append(child)
+        if ctx in stat.condition:
+            stat.condition.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ == "TerminalNodeImpl":
+                    stat.condition.append(str(child))
+                else:
+                    if child.__class__.__name__ == "Literal_tContext":
+                        stat.condition.append(str(child.LITERAL()))
+                    else:
+                        if child.__class__.__name__ == "Int_tContext":
+                            stat.condition.append(str(child.INT()))
+                        else:
+                            if child.__class__.__name__ == "Float_tContext":
+                                stat.condition.append(str(child.FLOAT()))
+                            else:
+                                stat.condition.append(child)
     return self.visitChildren(ctx)
 
 
@@ -992,8 +1159,6 @@ class Visitor(like_rubyVisitor):
                                 assign.value.append(str(child.FLOAT()))
                             else:
                                 assign.value.append(child)
-        print("-----------------------------------------000000000")
-        assign.print_info()
     return self.visitChildren(ctx)
 
 
@@ -1046,6 +1211,12 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#comparison_list.
   def visitComparison_list(self, ctx:like_rubyParser.Comparison_listContext):
+    for stat in self.if_statements:
+        if ctx in stat.condition:
+            stat.condition.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminatorContext':
+                    stat.condition.append(child)
     return self.visitChildren(ctx)
 
 
@@ -1059,6 +1230,18 @@ class Visitor(like_rubyVisitor):
                     stat.end_value.append(str(child))
                 else:
                     stat.end_value.append(child)
+    for stat in self.if_statements:
+        if ctx in stat.condition:
+            stat.condition.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ =='TerminalNodeImpl':
+                    stat.operator = (str(child))
+                else:
+                    stat.condition.append(child)
+            print(len(stat.condition))
+            value = stat.condition[-2]
+            stat.condition.remove(value)
+            stat.var.append(value)
     return self.visitChildren(ctx)
 
 
@@ -1072,6 +1255,23 @@ class Visitor(like_rubyVisitor):
                     stat.end_value.append(str(child))
                 else:
                     stat.end_value.append(child)
+    for stat in self.if_statements:
+        if ctx in stat.condition:
+            stat.condition.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ =='TerminalNodeImpl':
+                    stat.condition.append(str(child))
+                else:
+                    stat.condition.append(child)
+        if ctx in stat.var:
+            stat.var.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ =='TerminalNodeImpl':
+                    stat.var.append(str(child))
+                else:
+                    stat.var.append(child)
+        print("LASJFBKJABFLSABFLASB___________")
+        stat.print_info()
     return self.visitChildren(ctx)
 
 
@@ -1131,14 +1331,25 @@ class Visitor(like_rubyVisitor):
             for child in ctx.children:
                 if child.__class__.__name__ != "TerminalNodeImpl":
                     stat.expressions.append(child)
+    for stat in self.if_statements:
+        if ctx in stat.if_expressions:
+            stat.if_expressions.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminatorContext':
+                    stat.if_expressions.append(child)
+        if ctx in stat.else_expressions:
+            stat.else_expressions.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != "TerminalNodeImpl":
+                    stat.else_expressions.append(child)
+        print("-----------------------------------------000000000")
+        stat.print_info()
     for assign in self.assignments:
         if ctx in assign.value:
             assign.value.remove(ctx)
             for child in ctx.children:
                 if child.__class__.__name__ != "TerminalNodeImpl":
                     assign.value.append(child)
-        print("-----------------------------------------000000000")
-        assign.print_info()
     return self.visitChildren(ctx)
 
 
