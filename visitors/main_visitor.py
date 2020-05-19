@@ -305,6 +305,13 @@ class Visitor(like_rubyVisitor):
                 for child in ctx.children:
                     if child.__class__.__name__ == "Function_call_param_listContext":
                         calling.function_params.append(child)
+        for assignment in self.row_assignments:
+            if ctx in assignment.table:
+                assignment.table.remove(ctx)
+                assignment.table.append(calling)
+                for child in ctx.children:
+                    if child.__class__.__name__ == "Function_call_param_listContext":
+                        calling.function_params.append(child)
         for func in self.if_statements:
             if ctx in func.if_expressions:
                 func.if_expressions.remove(ctx)
@@ -378,6 +385,13 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#function_call_assignment.
   def visitFunction_call_assignment(self, ctx:like_rubyParser.Function_call_assignmentContext):
+    for assignment in self.row_assignments:
+        if ctx in assignment.table:
+            assignment.table.remove(ctx)
+            for child in ctx.children:
+                assignment.table.append(child)
+        print("AKJSBFJKSABLAJLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL")
+        assignment.print_info()
     return self.visitChildren(ctx)
 
 

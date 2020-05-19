@@ -42,7 +42,14 @@ class Interpreter:
                 self.file_.write(result)
                 self.file_.write("\n")
             if expr.__class__.__name__ == 'AstRowAssignment':
-                result = str(expr.var) + ' = ' + "Row(" + str(expr.table) + ", " + expr.row_vars + ")"
+                result = str(expr.var) + ' = ' + "Row("
+                result += str(expr.table[0].name) + '('
+                for param in expr.table[0].function_params:
+                    if param == expr.table[0].function_params[-1]:
+                        result += str(param)
+                    else:
+                        result += str(param) + ', '
+                result += "), " + expr.row_vars + ")"
                 #if expr.table[0].__class__.__name__ == 'Function_call_assignmentContext':
                 #    result += str(expr.table[0].name) + "(" + expr.table[0].params[0] + ", " + expr.table[0].params[0] + ")"+ ", \"" + str(expr.table[0].row_vars) + "\")"
                 self.file_.write(result)
@@ -50,7 +57,10 @@ class Interpreter:
             if expr.__class__.__name__ == 'AstFunctionCall':
                 result = str(expr.name) + '('
                 for param in expr.function_params:
-                    result += str(param) + ', '
+                    if param == expr.function_params[-1]:
+                        result += str(param)
+                    else:
+                        result += str(param) + ', '
                 result += ")"
                 self.file_.write(result)
                 self.file_.write("\n")
@@ -62,7 +72,10 @@ class Interpreter:
                     if e.__class__.__name__ == 'AstFunctionCall':
                         result = '\t' + str(e.name) + '('
                         for param in e.function_params:
-                            result += str(param) + ', '
+                            if param == e.function_params[-1]:
+                                result += str(param)
+                            else:
+                                result += str(param) + ', '
                         result += ")"
                         self.file_.write(result)
                         self.file_.write("\n")
@@ -114,7 +127,10 @@ class Interpreter:
                     if e.__class__.__name__ == 'AstFunctionCall':
                         result = '\t' + str(e.name) + '('
                         for param in e.function_params:
-                            result += str(param) + ', '
+                            if param == e.function_params[-1]:
+                                result += str(param)
+                            else:
+                                result += str(param) + ', '
                         result += ")"
                         self.file_.write(result)
                         self.file_.write("\n")
@@ -164,7 +180,10 @@ class Interpreter:
                         if e.__class__.__name__ == 'AstFunctionCall':
                             result = '\t' + str(e.name) + '('
                             for param in e.function_params:
-                                result += str(param) + ', '
+                                if param == e.function_params[-1]:
+                                    result += str(param)
+                                else:
+                                    result += str(param) + ', '
                             result += ")"
                             self.file_.write(result)
                             self.file_.write("\n")
@@ -208,4 +227,72 @@ class Interpreter:
                             result = result.replace(")", '')
                             self.file_.write(result)
                             self.file_.write("\n")
+        for function in self.ast.functions:
+            result = 'def ' + str(function.name) + '('
+            for param in function.function_params:
+                if param == function.function_params[-1]:
+                    result += str(param)
+                else:
+                    result += str(param) + ', '
+            result += "):"
+            self.file_.write(result)
+            self.file_.write("\n")
+            for expr in function.expressions:
+                if expr.__class__.__name__ == 'AstIntAssignment' or expr.__class__.__name__ == 'AstFloatAssignment':
+                    result = '\t' + str(expr.var) + ' = '
+                    for value in expr.value:
+                        if not (value == "Integer" or value == "Float"):
+                            result += value
+                        #else:
+                            #if value == 'Integer':
+                            #    result += "to_i()"
+                            #else:
+                            #    if value == 'Float':
+                            #        result += "to_f()"
+                    result = result.replace("(", '')
+                    result = result.replace(")", '')
+                    self.file_.write(result)
+                    self.file_.write("\n")
+                if expr.__class__.__name__ == 'AstStringAssignment':
+                    result = '\t' + str(expr.var) + ' = '
+                    for value in expr.value:
+                        if not (value == ")" or value == "("):
+                            if value == 'String':
+                                result += "str("
+                            else:
+                                if not value == ")":
+                                    result += value
+                    result = result.replace(")", '')
+                    if "str(" in result:
+                        result += ")"
+                    self.file_.write(result)
+                    self.file_.write("\n")
+                if expr.__class__.__name__ == 'AstColumnAssignment':
+                    result = '\t' + str(expr.var) + ' = ' + "Column(" + str(expr.column_name) + ", \"" + str(expr.type) + "\")"
+                    self.file_.write(result)
+                    self.file_.write("\n")
+                if expr.__class__.__name__ == 'AstRowAssignment':
+                    result = '\t' + str(expr.var) + ' = ' + "Row("
+                    result += str(expr.table[0].name) + '('
+                    for param in expr.table[0].function_params:
+                        if param == expr.table[0].function_params[-1]:
+                            result += str(param)
+                        else:
+                            result += str(param) + ', '
+                    result += "), " + expr.row_vars + ")"
+                    #if expr.table[0].__class__.__name__ == 'Function_call_assignmentContext':
+                    #    result += str(expr.table[0].name) + "(" + expr.table[0].params[0] + ", " + expr.table[0].params[0] + ")"+ ", \"" + str(expr.table[0].row_vars) + "\")"
+                    self.file_.write(result)
+                    self.file_.write("\n")
+                if expr.__class__.__name__ == 'AstFunctionCall':
+                    result = '\t' + str(expr.name) + '('
+                    for param in expr.function_params:
+                        if param == expr.function_params[-1]:
+                            result += str(param)
+                        else:
+                            result += str(param) + ', '
+                    result += ")"
+                    self.file_.write(result)
+                    self.file_.write("\n")
+        #starting function writing
             print(expr)
