@@ -23,6 +23,13 @@ class Interpreter:
                 result = result.replace(")", '')
                 self.file_.write(result)
                 self.file_.write("\n")
+            if expr.__class__.__name__ == 'AstArray':
+                result = str(expr.name) + ' = []\n'
+                for elem in expr.elements:
+                    index = expr.elements.index(elem)
+                    result += str(expr.name) + "[" + expr.indexes[index] + "]" + ' = ' + elem + '\n'
+                self.file_.write(result)
+                self.file_.write("\n")
             if expr.__class__.__name__ == 'AstStringAssignment':
                 result = str(expr.var) + ' = '
                 for value in expr.value:
@@ -79,6 +86,13 @@ class Interpreter:
                         result += ")"
                         self.file_.write(result)
                         self.file_.write("\n")
+                    if e.__class__.__name__ == 'AstArray':
+                        result = '\t' + str(e.name) + ' = []\n'
+                        for elem in e.elements:
+                            index = e.elements.index(elem)
+                            result += '\t' + str(e.name) + "[" + e.indexes[index] + "]" + ' = ' + elem + '\n'
+                        self.file_.write(result)
+                        self.file_.write("\n")
                     if e.__class__.__name__ == 'AstStringAssignment':
                         result = '\t' + str(e.var) + ' = '
                         for value in e.value:
@@ -132,6 +146,13 @@ class Interpreter:
                             else:
                                 result += str(param) + ', '
                         result += ")"
+                        self.file_.write(result)
+                        self.file_.write("\n")
+                    if e.__class__.__name__ == 'AstArray':
+                        result = '\t' + str(e.name) + ' = []\n'
+                        for elem in e.elements:
+                            index = e.elements.index(elem)
+                            result += '\t' + str(e.name) + "[" + e.indexes[index] + "]" + ' = ' + elem + '\n'
                         self.file_.write(result)
                         self.file_.write("\n")
                     if e.__class__.__name__ == 'AstStringAssignment':
@@ -253,6 +274,13 @@ class Interpreter:
                     result = result.replace(")", '')
                     self.file_.write(result)
                     self.file_.write("\n")
+                if expr.__class__.__name__ == 'AstArray':
+                    result = '\t' + str(expr.name) + ' = []\n'
+                    for elem in expr.elements:
+                        index = expr.elements.index(elem)
+                        result += '\t' + str(expr.name) + "[" + expr.indexes[index] + "]" + ' = ' + elem + '\n'
+                    self.file_.write(result)
+                    self.file_.write("\n")
                 if expr.__class__.__name__ == 'AstStringAssignment':
                     result = '\t' + str(expr.var) + ' = '
                     for value in expr.value:
@@ -294,5 +322,8 @@ class Interpreter:
                     result += ")"
                     self.file_.write(result)
                     self.file_.write("\n")
+            result = '\treturn ' + str(function.return_var[0])
+            self.file_.write(result)
+            self.file_.write("\n")
         #starting function writing
             print(expr)

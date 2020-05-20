@@ -3,6 +3,7 @@ class AstFunction:
         self.name = function_name
         self.expressions = []
         self.function_params = []
+        self.return_var = []
 
     def print_info(self):
         print("Name:")
@@ -11,3 +12,5 @@ class AstFunction:
         print(self.expressions)
         print("Params:")
         print(self.function_params)
+        print("Return statement:")
+        print(self.return_var)

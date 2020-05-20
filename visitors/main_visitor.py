@@ -280,6 +280,12 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#return_statement.
   def visitReturn_statement(self, ctx:like_rubyParser.Return_statementContext):
+    for func in self.programm.functions:
+        if ctx in func.expressions:
+            func.expressions.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ != 'TerminalNodeImpl':
+                    func.return_var.append(child)
     return self.visitChildren(ctx)
 
   #TODO check calling function in params of function!!!
@@ -399,6 +405,14 @@ class Visitor(like_rubyVisitor):
 
   # Visit a parse tree produced by like_rubyParser#all_result.
   def visitAll_result(self, ctx:like_rubyParser.All_resultContext):
+    for func in self.programm.functions:
+        if ctx in func.return_var:
+            func.return_var.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ =='TerminalNodeImpl':
+                    func.return_var.append(str(child))
+                else:
+                    func.return_var.append(child)
     for stat in self.for_statement:
         if ctx in stat.end_value:
             stat.end_value.remove(ctx)
@@ -998,7 +1012,6 @@ class Visitor(like_rubyVisitor):
     self.arrays.append(float_assignment)
     return self.visitChildren(ctx)
 
-  # Name check!!!
   # Visit a parse tree produced by like_rubyParser#array_assignment.
   def visitArray_assignment(self, ctx:like_rubyParser.Array_assignmentContext):
     for assignment in self.arrays:
@@ -1012,29 +1025,23 @@ class Visitor(like_rubyVisitor):
                 if ctx in func.expressions:
                     func.expressions.remove(ctx)
                     for child in ctx.children:
-                        if child.__class__.__name__ == 'TerminalNodeImpl':
-                            assignment.elements.append(str(child))
-                        else:
+                        if child.__class__.__name__ != 'TerminalNodeImpl':
                             assignment.elements.append(child)
-                    func.expressions.append(float_assignment)
+                    #func.expressions.append(float_assignment)
             for call in self.function_calls:
                 if ctx in call.function_params:
                     call.function_params.remove(ctx)
                     for child in ctx.children:
-                        if child.__class__.__name__ == 'TerminalNodeImpl':
-                            assignment.elements.append(str(child))
-                        else:
+                        if child.__class__.__name__ != 'TerminalNodeImpl':
                             assignment.elements.append(child)
-                    call.function_params.append(float_assignment)
+                    #call.function_params.append(float_assignment)
             for stat in self.for_statement:
                 if ctx in stat.expressions:
                     stat.expressions.remove(ctx)
                     for child in ctx.children:
-                        if child.__class__.__name__ == 'TerminalNodeImpl':
-                            assignment.elements.append(str(child))
-                        else:
+                        if child.__class__.__name__ != 'TerminalNodeImpl':
                             assignment.elements.append(child)
-                    stat.expression.append(float_assignment)
+                    #stat.expression.append(float_assignment)
     return self.visitChildren(ctx)
 
 
@@ -1060,15 +1067,12 @@ class Visitor(like_rubyVisitor):
                             assignment.elements.append(child)
                         if child.__class__.__name__ == 'Int_resultContext':
                             assignment.indexes.append(child)
-        #print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-        #assignment.print_info()
     return self.visitChildren(ctx)
 
 
   # Visit a parse tree produced by like_rubyParser#dynamic_result.
   def visitDynamic_result(self, ctx:like_rubyParser.Dynamic_resultContext):
     return self.visitChildren(ctx)
-
 
   # Visit a parse tree produced by like_rubyParser#dynamic.
   def visitDynamic(self, ctx:like_rubyParser.DynamicContext):
@@ -1078,6 +1082,14 @@ class Visitor(like_rubyVisitor):
               for child in ctx.children:
                   if child.__class__.__name__ != 'TerminalNodeImpl':
                       call.function_params.append(str(ctx.my_id().ID()))
+        #for func in self.programm.function_result
+    for call in self.programm.functions:
+        if ctx in call.return_var:
+              call.return_var.remove(ctx)
+              for child in ctx.children:
+                  if child.__class__.__name__ != 'TerminalNodeImpl':
+
+                      call.return_var.append(str(ctx.my_id().ID()))
     for stat in self.for_statement:
         if ctx in stat.end_value:
             stat.end_value.remove(ctx)
@@ -1243,6 +1255,23 @@ class Visitor(like_rubyVisitor):
                                 assignment.elements.append(str(child.FLOAT()))
                             else:
                                 assignment.elements.append(child)
+    for func in self.programm.functions:
+        if ctx in func.return_var:
+            func.return_var.remove(ctx)
+            for child in ctx.children:
+                if child.__class__.__name__ == "TerminalNodeImpl":
+                    func.return_var.append(str(child))
+                else:
+                    if child.__class__.__name__ == "Literal_tContext":
+                        func.return_var.append(str(child.LITERAL()))
+                    else:
+                        if child.__class__.__name__ == "Int_tContext":
+                            func.return_var.append(str(child.INT()))
+                        else:
+                            if child.__class__.__name__ == "Float_tContext":
+                                func.return_var.append(str(child.FLOAT()))
+                            else:
+                                func.return_var.append(child)
     return self.visitChildren(ctx)
 
 
