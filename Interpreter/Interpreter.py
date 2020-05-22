@@ -4,6 +4,10 @@ class Interpreter:
         self.file_ = open(target_file, "w")
         self.file_.flush()
         self.file_.write("#!/usr/bin/python3\n\n")
+        self.file_.write("from RELib.Column import Column\n")
+        self.file_.write("from RELib.Row import Row\n")
+        self.file_.write("from RELib.Table import Table\n\n")
+
 
     def interper_programm(self):
         for expr in  self.ast.expressions:
