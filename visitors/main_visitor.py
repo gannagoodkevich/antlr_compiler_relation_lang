@@ -269,8 +269,12 @@ class Visitor(like_rubyVisitor):
             if str(ctx.my_id().ID()) in self.programm.local_variables:
                 table.columns.append(str(ctx.my_id().ID()))
             else:
-                error = "Hello table assignment params error"
-                self.programm.errors.append(error)
+                for func in self.programm.functions:
+                    if table in func.expressions:
+                        table.columns.append(str(ctx.my_id().ID()))
+                    else:
+                        error = "Hello assignment params error"
+                        self.programm.errors.append(error)
     return self.visitChildren(ctx)
 
 
@@ -294,47 +298,46 @@ class Visitor(like_rubyVisitor):
     if not function_name in self.programm.declared_function_names:
         error_text = "Hello function_call error: " + function_name # if function defined after function call this error will also occur
         self.programm.errors.append(error_text)
-    else:
-        for func in self.programm.functions:
-            if ctx in func.expressions:
-                func.expressions.remove(ctx)
-                func.expressions.append(calling)
-                for child in ctx.children:
-                    if child.__class__.__name__ == "Function_call_param_listContext":
-                        calling.function_params.append(child)
-        for func in self.for_statement:
-            if ctx in func.expressions:
-                func.expressions.remove(ctx)
-                func.expressions.append(calling)
-                for child in ctx.children:
-                    if child.__class__.__name__ == "Function_call_param_listContext":
-                        calling.function_params.append(child)
-        for assignment in self.row_assignments:
-            if ctx in assignment.table:
-                assignment.table.remove(ctx)
-                assignment.table.append(calling)
-                for child in ctx.children:
-                    if child.__class__.__name__ == "Function_call_param_listContext":
-                        calling.function_params.append(child)
-        for func in self.if_statements:
-            if ctx in func.if_expressions:
-                func.if_expressions.remove(ctx)
-                func.if_expressions.append(calling)
-                for child in ctx.children:
-                    if child.__class__.__name__ == "Function_call_param_listContext":
-                        calling.function_params.append(child)
-            if ctx in func.else_expressions:
-                func.else_expressions.remove(ctx)
-                func.else_expressions.append(calling)
-                for child in ctx.children:
-                    if child.__class__.__name__ == "Function_call_param_listContext":
-                        calling.function_params.append(child)
-        if ctx in self.programm.expressions:
-            self.programm.expressions.remove(ctx)
-            self.programm.expressions.append(calling)
+    for func in self.programm.functions:
+        if ctx in func.expressions:
+            func.expressions.remove(ctx)
+            func.expressions.append(calling)
             for child in ctx.children:
                 if child.__class__.__name__ == "Function_call_param_listContext":
                     calling.function_params.append(child)
+    for func in self.for_statement:
+        if ctx in func.expressions:
+            func.expressions.remove(ctx)
+            func.expressions.append(calling)
+            for child in ctx.children:
+                if child.__class__.__name__ == "Function_call_param_listContext":
+                    calling.function_params.append(child)
+    for assignment in self.row_assignments:
+        if ctx in assignment.table:
+            assignment.table.remove(ctx)
+            assignment.table.append(calling)
+            for child in ctx.children:
+                if child.__class__.__name__ == "Function_call_param_listContext":
+                    calling.function_params.append(child)
+    for func in self.if_statements:
+        if ctx in func.if_expressions:
+            func.if_expressions.remove(ctx)
+            func.if_expressions.append(calling)
+            for child in ctx.children:
+                if child.__class__.__name__ == "Function_call_param_listContext":
+                    calling.function_params.append(child)
+        if ctx in func.else_expressions:
+            func.else_expressions.remove(ctx)
+            func.else_expressions.append(calling)
+            for child in ctx.children:
+                if child.__class__.__name__ == "Function_call_param_listContext":
+                    calling.function_params.append(child)
+    if ctx in self.programm.expressions:
+        self.programm.expressions.remove(ctx)
+        self.programm.expressions.append(calling)
+        for child in ctx.children:
+            if child.__class__.__name__ == "Function_call_param_listContext":
+                calling.function_params.append(child)
     return self.visitChildren(ctx)
 
 
@@ -892,7 +895,7 @@ class Visitor(like_rubyVisitor):
                     if child.__class__.__name__ == "LvalueContext":
                         string_assignment.var = ctx.lvalue().my_id().ID()
                     else:
-                        string_assignment.value.append(child)
+                        string_assignment.params.append(child)
             call.function_params.append(string_assignment)
     for stat in self.for_statement:
         if ctx in stat.expressions:
@@ -902,9 +905,9 @@ class Visitor(like_rubyVisitor):
                     if child.__class__.__name__ == "LvalueContext":
                         string_assignment.var = ctx.lvalue().my_id().ID()
                     else:
-                        if not child in string_assignment.value:
-                            string_assignment.value.append(child)
-            stat.expression.append(string_assignment)
+                        if not child in string_assignment.params:
+                            string_assignment.params.append(child)
+            stat.expressions.append(string_assignment)
     self.row_assignments.append(string_assignment)
     return self.visitChildren(ctx)
 
@@ -1000,7 +1003,7 @@ class Visitor(like_rubyVisitor):
                 if child.__class__.__name__ != 'TerminatorContext':
                     if child.__class__.__name__ == "LvalueContext":
                         float_assignment.name = ctx.lvalue().my_id().ID()
-            stat.expression.append(float_assignment)
+            stat.expressions.append(float_assignment)
     self.arrays.append(float_assignment)
     return self.visitChildren(ctx)
 

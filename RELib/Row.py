@@ -1,7 +1,9 @@
 class Row:
     def __init__(self, columns, values):
-        self.row = {}
+        self.info = {}
         if len(columns) == len(values):
             for value in values:
                 column = columns[values.index(value)]
-                row[columnn.name] = value
+                self.info[column.name] = value
+        else:
+            print("Error: column value is not matching")

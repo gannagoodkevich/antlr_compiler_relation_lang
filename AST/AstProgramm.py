@@ -2,7 +2,7 @@ class AstProgramm:
     def __init__(self):
         self.expressions = []
         self.local_variables = []
-        self.declared_function_names = ['add_row', 'get_columns']
+        self.declared_function_names = ['add_row', 'get_columns', 'show']
         self.defined_function_names = []
         self.functions = []
         self.errors = []
