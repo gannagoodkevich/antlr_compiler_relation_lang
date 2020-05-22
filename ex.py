@@ -16,8 +16,9 @@ def main(argv):
     visitor = Visitor()
     visitor.visit(tree)
     # print(visitor.memory)
+    print("----------------------Programm----------------------")
     visitor.programm.print_info()
-    print("Functions:")
+    print("----------------------Functions----------------------")
     for func in visitor.programm.functions:
         func.print_info()
     interper_programm = Interpreter(visitor.programm, target_file)

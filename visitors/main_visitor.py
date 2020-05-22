@@ -108,8 +108,6 @@ class Visitor(like_rubyVisitor):
             for child in ctx.children:
                 if child.__class__.__name__ != 'TerminatorContext':
                     stat.else_expressions.append(child)
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAA--AAAAAAAAAAAAAAAAAAAAAAAAAAA")
-        stat.print_info()
     return self.visitChildren(ctx)
 
 
@@ -273,8 +271,6 @@ class Visitor(like_rubyVisitor):
             else:
                 error = "Hello table assignment params error"
                 self.programm.errors.append(error)
-
-            print(table.columns)
     return self.visitChildren(ctx)
 
 
@@ -398,8 +394,6 @@ class Visitor(like_rubyVisitor):
             assignment.table.remove(ctx)
             for child in ctx.children:
                 assignment.table.append(child)
-        print("AKJSBFJKSABLAJLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL")
-        assignment.print_info()
     return self.visitChildren(ctx)
 
 
@@ -444,8 +438,6 @@ class Visitor(like_rubyVisitor):
                     assignment.elements.append(str(child))
                 else:
                     assignment.elements.append(child)
-        print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
-        assignment.print_info()
     return self.visitChildren(ctx)
 
 
@@ -1384,7 +1376,6 @@ class Visitor(like_rubyVisitor):
                             assignment.columns.append(str(child_child))
                         if child_child.__class__.__name__ =='Function_definition_params_listContext':
                             assignment.columns.append(child_child)
-        assignment.print_info()
     return self.visitChildren(ctx)
 
 
@@ -1446,7 +1437,6 @@ class Visitor(like_rubyVisitor):
                     stat.operator = (str(child))
                 else:
                     stat.condition.append(child)
-            print(len(stat.condition))
             value = stat.condition[-2]
             stat.condition.remove(value)
             stat.var.append(value)
@@ -1478,8 +1468,6 @@ class Visitor(like_rubyVisitor):
                     stat.var.append(str(child))
                 else:
                     stat.var.append(child)
-        print("LASJFBKJABFLSABFLASB___________")
-        stat.print_info()
     return self.visitChildren(ctx)
 
 
@@ -1550,8 +1538,6 @@ class Visitor(like_rubyVisitor):
             for child in ctx.children:
                 if child.__class__.__name__ != "TerminalNodeImpl":
                     stat.else_expressions.append(child)
-        print("-----------------------------------------000000000")
-        stat.print_info()
     for assign in self.assignments:
         if ctx in assign.value:
             assign.value.remove(ctx)

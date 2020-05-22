@@ -27,5 +27,4 @@ class AstProgramm:
         self.expressions.append(expr)
 
     def remove_expression(self, expr):
-        print("remove expression")
         self.expressions.remove(expr)
